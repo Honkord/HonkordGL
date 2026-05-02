@@ -1,0 +1,26 @@
+{
+  "namespace": "org.honkord.generated",
+  "classes": [
+    {
+      "name": "WindowBinding",
+      "nativePrefix": "hgWindow",
+      "methods": [
+        { "name": "isBackendReady", "return": "int", "args": [] }
+      ]
+    },
+    {
+      "name": "VideoBinding",
+      "nativePrefix": "hgVideo",
+      "methods": [
+        { "name": "isVideoInitialized", "return": "int", "args": [] }
+      ]
+    },
+    {
+      "name": "SpriteBinding",
+      "nativePrefix": "hgSprite",
+      "methods": [
+        { "name": "isSpriteApiReady", "return": "int", "args": [] }
+      ]
+    }
+  ]
+}

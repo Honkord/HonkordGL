@@ -1,0 +1,17 @@
+# Build artifacts
+*.o
+*.a
+*.obj
+*.lib
+*.dll
+*.exe
+build/
+
+# Example / test binaries (rebuild with g++ per comments in each Main.cpp / test)
+tests/Window/TestWindow
+tests/DrawSprite/TestSprite
+works/MovingSquare/MovingSquare
+works/GPURaytracing/GPURaytracing
+works/Checkerboard/Checkerboard
+works/AsteroidGame/AsteroidGame
+works/Tetris/Tetris
