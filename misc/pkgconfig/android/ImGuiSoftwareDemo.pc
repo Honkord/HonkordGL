@@ -1,0 +1,5 @@
+# ImGuiSoftwareDemo demo — toolchain android
+Name: ImGuiSoftwareDemo
+Description: Dear ImGui software demo (works/ImGuiSoftwareDemo)
+Version: 0.1.0
+Requires: HonkordGL

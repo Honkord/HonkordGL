@@ -1,43 +1,30 @@
 # Wayland Protocol Configuration
 
-This folder defines the protocol generation configuration requested for:
-
-- cursor shapes
-- fractional scales
-- color modifiers
-- color management
-- frog color management
-- single pixel framebuffer
-- text inputs
-- viewporter
-- xdg family:
-  - activation
-  - decoration
-  - dialog
-  - foreign unstable
-  - shell
-  - icons
+Protocols tracked for HonkordGL include tablet v2, cursor shapes, fractional scale, DRM syncobj, single-pixel buffer, text input, viewporter, xdg-shell and related extensions (see `protocols.json`).
 
 ## Files
 
-- `protocols.json` protocol registry and output naming.
-- `generate_protocols.py` scanner runner.
-- `CMakeLists.wayland-protocols.cmake` CMake integration snippet.
+- `protocols.json` — registry with paths under **`xml/`** (vendored upstream definitions).
+- `xml/` — snapshot of **wayland-protocols** (same layout as `/usr/share/wayland-protocols`).
+- `generate_protocols.py` — runs **wayland-scanner**; supports `sync` to refresh **`xml/`**.
+- `CMakeLists.wayland-protocols.cmake` — shim that includes **`cmake/WaylandProtocols.cmake`**.
 
-## Generate now
+## Refresh vendored XML
+
+```bash
+python3 wayland/generate_protocols.py sync
+python3 wayland/generate_protocols.py sync /path/to/wayland-protocols
+```
+
+## Generate headers/sources
 
 ```bash
 python3 wayland/generate_protocols.py
 ```
 
-Generated files go to:
-
-- `src/Wayland/generated/*.h`
-- `src/Wayland/generated/*.c`
+Output: `src/Wayland/generated/*.h` and `*.c`.
 
 ## Notes
 
-- Protocol XMLs are expected from `wayland-protocols` package paths under
-  `/usr/share/wayland-protocols`.
-- Missing XML files are skipped by the Python generator, allowing partial
-  protocol availability across distros/toolchains.
+- CMake uses **`wayland/xml`** so builds do not rely on `/usr/share` at configure time.
+- **`python3 wayland/generate_protocols.py sync`** repopulates **`xml/`** when distros ship newer packages.

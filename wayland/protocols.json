@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Wayland protocol configuration for HonkordGL",
+  "xmlRoot": "wayland/xml",
   "outputDir": "src/Wayland/generated",
   "scanner": {
     "binary": "wayland-scanner",
@@ -9,102 +10,95 @@
   },
   "protocols": [
     {
+      "id": "tablet-v2",
+      "xml": "wayland/xml/stable/tablet/tablet-v2.xml",
+      "clientHeader": "tablet-v2-client-protocol.h",
+      "privateCode": "tablet-v2-protocol.c",
+      "tags": ["tablet"]
+    },
+    {
       "id": "cursor-shape-v1",
-      "xml": "/usr/share/wayland-protocols/staging/cursor-shape/cursor-shape-v1.xml",
+      "xml": "wayland/xml/staging/cursor-shape/cursor-shape-v1.xml",
       "clientHeader": "cursor-shape-v1-client-protocol.h",
       "privateCode": "cursor-shape-v1-protocol.c",
       "tags": ["cursor", "shapes"]
     },
     {
       "id": "fractional-scale-v1",
-      "xml": "/usr/share/wayland-protocols/staging/fractional-scale/fractional-scale-v1.xml",
+      "xml": "wayland/xml/staging/fractional-scale/fractional-scale-v1.xml",
       "clientHeader": "fractional-scale-v1-client-protocol.h",
       "privateCode": "fractional-scale-v1-protocol.c",
       "tags": ["fractional", "scale"]
     },
     {
       "id": "linux-drm-syncobj-v1",
-      "xml": "/usr/share/wayland-protocols/staging/linux-drm-syncobj/linux-drm-syncobj-v1.xml",
+      "xml": "wayland/xml/staging/linux-drm-syncobj/linux-drm-syncobj-v1.xml",
       "clientHeader": "linux-drm-syncobj-v1-client-protocol.h",
       "privateCode": "linux-drm-syncobj-v1-protocol.c",
-      "tags": ["color-modifier", "drm"]
+      "tags": ["drm"]
     },
     {
       "id": "single-pixel-buffer-v1",
-      "xml": "/usr/share/wayland-protocols/staging/single-pixel-buffer/single-pixel-buffer-v1.xml",
+      "xml": "wayland/xml/staging/single-pixel-buffer/single-pixel-buffer-v1.xml",
       "clientHeader": "single-pixel-buffer-v1-client-protocol.h",
       "privateCode": "single-pixel-buffer-v1-protocol.c",
-      "tags": ["single-pixel", "framebuffer"]
+      "tags": ["single-pixel"]
     },
     {
       "id": "text-input-v3",
-      "xml": "/usr/share/wayland-protocols/stable/text-input/text-input-v3.xml",
+      "xml": "wayland/xml/unstable/text-input/text-input-unstable-v3.xml",
       "clientHeader": "text-input-v3-client-protocol.h",
       "privateCode": "text-input-v3-protocol.c",
       "tags": ["text-input"]
     },
     {
       "id": "viewporter",
-      "xml": "/usr/share/wayland-protocols/stable/viewporter/viewporter.xml",
+      "xml": "wayland/xml/stable/viewporter/viewporter.xml",
       "clientHeader": "viewporter-client-protocol.h",
       "privateCode": "viewporter-protocol.c",
       "tags": ["viewporter"]
     },
     {
-      "id": "xx-color-management-v4",
-      "xml": "/usr/share/wayland-protocols/staging/color-management/xx-color-management-v4.xml",
-      "clientHeader": "xx-color-management-v4-client-protocol.h",
-      "privateCode": "xx-color-management-v4-protocol.c",
-      "tags": ["color-management"]
-    },
-    {
-      "id": "frog-color-management-v1",
-      "xml": "/usr/share/wayland-protocols/staging/frog-color-management/frog-color-management-v1.xml",
-      "clientHeader": "frog-color-management-v1-client-protocol.h",
-      "privateCode": "frog-color-management-v1-protocol.c",
-      "tags": ["frog-color-management"]
-    },
-    {
       "id": "xdg-shell",
-      "xml": "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml",
+      "xml": "wayland/xml/stable/xdg-shell/xdg-shell.xml",
       "clientHeader": "xdg-shell-client-protocol.h",
       "privateCode": "xdg-shell-protocol.c",
       "tags": ["xdg", "shell"]
     },
     {
       "id": "xdg-activation-v1",
-      "xml": "/usr/share/wayland-protocols/staging/xdg-activation/xdg-activation-v1.xml",
+      "xml": "wayland/xml/staging/xdg-activation/xdg-activation-v1.xml",
       "clientHeader": "xdg-activation-v1-client-protocol.h",
       "privateCode": "xdg-activation-v1-protocol.c",
-      "tags": ["xdg", "activation"]
+      "tags": ["xdg"]
     },
     {
       "id": "xdg-decoration-unstable-v1",
-      "xml": "/usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
+      "xml": "wayland/xml/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
       "clientHeader": "xdg-decoration-unstable-v1-client-protocol.h",
       "privateCode": "xdg-decoration-unstable-v1-protocol.c",
-      "tags": ["xdg", "decoration"]
+      "tags": ["xdg"]
     },
     {
       "id": "xdg-dialog-v1",
-      "xml": "/usr/share/wayland-protocols/staging/xdg-dialog/xdg-dialog-v1.xml",
+      "xml": "wayland/xml/staging/xdg-dialog/xdg-dialog-v1.xml",
       "clientHeader": "xdg-dialog-v1-client-protocol.h",
       "privateCode": "xdg-dialog-v1-protocol.c",
-      "tags": ["xdg", "dialog"]
+      "tags": ["xdg"]
     },
     {
       "id": "xdg-foreign-unstable-v2",
-      "xml": "/usr/share/wayland-protocols/unstable/xdg-foreign/xdg-foreign-unstable-v2.xml",
+      "xml": "wayland/xml/unstable/xdg-foreign/xdg-foreign-unstable-v2.xml",
       "clientHeader": "xdg-foreign-unstable-v2-client-protocol.h",
       "privateCode": "xdg-foreign-unstable-v2-protocol.c",
-      "tags": ["xdg", "foreign-unstable"]
+      "tags": ["xdg"]
     },
     {
       "id": "xdg-toplevel-icon-v1",
-      "xml": "/usr/share/wayland-protocols/staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml",
+      "xml": "wayland/xml/staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml",
       "clientHeader": "xdg-toplevel-icon-v1-client-protocol.h",
       "privateCode": "xdg-toplevel-icon-v1-protocol.c",
-      "tags": ["xdg", "icons"]
+      "tags": ["xdg"]
     }
   ]
 }

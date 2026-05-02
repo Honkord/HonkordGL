@@ -1,0 +1,13 @@
+# HonkordGL — pkg-config (Linux GNU)
+honkord_prefix=/usr/local
+libdir=${honkord_prefix}/lib
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL windowing and rendering library (Linux: X11, Wayland, EGL, GL, ALSA)
+Version: 0.1.0
+
+Libs: -L${libdir} -lHonkordGL
+Cflags: -I${includedir} -I${honkord_prefix}/third_party/HonkordGL_ImGui -I${honkord_prefix}/third_party/HonkordGL_Nuklear -I${honkord_prefix}/third_party/Nuklear
+
+Libs.private: -lX11 -lXrandr -lXi -lXcursor -lwayland-client -lwayland-egl -lwayland-cursor -lEGL -lGL -lasound -ldl -lpthread -lm

@@ -160,8 +160,8 @@ help:
 >@echo "Cross-platform convenience (from repo root):"
 >@echo "  linux           Same as: make PLATFORM=linux all"
 >@echo "  windows         MinGW cross-build (win32 gcc flavor); PLATFORM=windows all"
->@echo "  cmake-mingw     CMake + mingw toolchain (x64) -> build/cmake-mingw-x64"
->@echo "  cmake-mingw-x86 CMake + mingw toolchain (x86) -> build/cmake-mingw-x86"
+>@echo "  cmake-mingw     CMake + mingw toolchain (x64, repo root) -> build/cmake-mingw-x64"
+>@echo "  cmake-mingw-x86 CMake + mingw toolchain (x86, repo root) -> build/cmake-mingw-x86"
 >@echo "  cross-platform  linux + windows + cmake-mingw (needs toolchains on this machine)"
 >@echo "  visualc / msbuild  Build visualC/HonkordGL.sln if msbuild is on PATH"
 >@echo "                     (otherwise prints how to open the solution on Windows)"
@@ -184,16 +184,16 @@ windows:
 
 # CMake MinGW (see mingw/README.md)
 MINGW_CMAKE_X64_DIR ?= build/cmake-mingw-x64
-MINGW_TC_X64 ?= $(abspath mingw/toolchain-x86_64-win32.cmake)
+MINGW_TC_X64 ?= $(abspath cmake/toolchains/mingw-x86_64.cmake)
 MINGW_CMAKE_X86_DIR ?= build/cmake-mingw-x86
-MINGW_TC_X86 ?= $(abspath mingw/toolchain-i686-win32.cmake)
+MINGW_TC_X86 ?= $(abspath cmake/toolchains/mingw-i686.cmake)
 
 cmake-mingw:
->cmake -S mingw -B "$(MINGW_CMAKE_X64_DIR)" -DCMAKE_TOOLCHAIN_FILE="$(MINGW_TC_X64)" -DHONKORDGL_BUILD_EXAMPLES=ON
+>cmake -S . -B "$(MINGW_CMAKE_X64_DIR)" -DCMAKE_TOOLCHAIN_FILE="$(MINGW_TC_X64)" -DHONKORDGL_BUILD_EXAMPLES=ON
 >cmake --build "$(MINGW_CMAKE_X64_DIR)" --parallel
 
 cmake-mingw-x86:
->cmake -S mingw -B "$(MINGW_CMAKE_X86_DIR)" -DCMAKE_TOOLCHAIN_FILE="$(MINGW_TC_X86)" -DHONKORDGL_BUILD_EXAMPLES=ON
+>cmake -S . -B "$(MINGW_CMAKE_X86_DIR)" -DCMAKE_TOOLCHAIN_FILE="$(MINGW_TC_X86)" -DHONKORDGL_BUILD_EXAMPLES=ON
 >cmake --build "$(MINGW_CMAKE_X86_DIR)" --parallel
 
 # Build every Makefile/CMake path available from a Unix host (Linux/macOS/WSL)

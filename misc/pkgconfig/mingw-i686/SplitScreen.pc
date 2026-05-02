@@ -1,0 +1,5 @@
+# SplitScreen demo — toolchain mingw-i686
+Name: SplitScreen
+Description: Split screen example (works/SplitScreen)
+Version: 0.1.0
+Requires: HonkordGL

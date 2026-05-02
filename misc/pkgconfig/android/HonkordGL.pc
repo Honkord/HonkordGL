@@ -1,0 +1,12 @@
+# HonkordGL — pkg-config (Android NDK, prebuilt libHonkordGL.so)
+honkord_prefix=/usr/local
+abi=arm64-v8a
+libdir=${honkord_prefix}/lib/${abi}
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL native library (Android NDK)
+Version: 0.1.0
+
+Libs: -L${libdir} -lHonkordGL -llog -landroid
+Cflags: -I${includedir}

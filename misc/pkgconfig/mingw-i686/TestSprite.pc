@@ -1,0 +1,5 @@
+# TestSprite test — toolchain mingw-i686
+Name: TestSprite
+Description: HonkordGL test (tests/DrawSprite)
+Version: 0.1.0
+Requires: HonkordGL

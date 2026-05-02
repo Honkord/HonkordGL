@@ -1,0 +1,5 @@
+# TestAudioSmoke test — toolchain linux
+Name: TestAudioSmoke
+Description: HonkordGL test (tests/Audio)
+Version: 0.1.0
+Requires: HonkordGL
