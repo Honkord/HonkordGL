@@ -3,8 +3,6 @@
 ### Honkord's Game Library (Indie Library) (ISO C++ V.: **C++ 17**)
 <img src="./Logo.png">
 
-<img src="./Honkord__APILogo.png">      <img src="./Honkord__GamerStyle.png">
-
 Honkord's Game Library is a powerful cross-platform low-level 
 multimedia library built for high performance video game 
 development. This library is built for interacting 
