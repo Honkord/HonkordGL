@@ -1,8 +1,7 @@
+### NOTE: Project is still in development...
+
 ### Honkord's Game Library (Indie Library) (ISO C++ V.: **C++ 17**)
 <img src="./Honkord__Logo.png">
-
-In this era of our early development, we are not looking forward for any requests
-on API changes at the moment. 
 
 <img src="./Honkord__APILogo.png">      <img src="./Honkord__GamerStyle.png">
 
