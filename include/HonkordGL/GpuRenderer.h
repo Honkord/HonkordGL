@@ -138,7 +138,7 @@ public:
      */
     HONKORDGL_ND int LoadShaderCompilerProcs() noexcept;
 
-    /** Resolves a graphics entry point by name for the current context. */
+    /** Resolves a graphics entry point by name for the current context (delegates to `RendererContextGetGraphicsProc`). */
     HONKORDGL_ND void * GetGraphicsProc(const char * name) noexcept;
 
     /**

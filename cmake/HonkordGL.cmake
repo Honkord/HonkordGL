@@ -14,6 +14,7 @@ set(HONKORDGL_CORE_LINUX
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
+    "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
     "${HONKORDGL_ROOT}/src/Camera.cpp"
     "${HONKORDGL_ROOT}/src/Sprite.cpp"
@@ -54,6 +55,7 @@ set(HONKORDGL_CORE_WINDOWS
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
+    "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
     "${HONKORDGL_ROOT}/src/Camera.cpp"
     "${HONKORDGL_ROOT}/src/Sprite.cpp"
@@ -211,6 +213,10 @@ if(HONKORDGL_BUILD_EXAMPLES)
     honkordgl_private_app(GPURaytracing _gpu)
     honkordgl_set_example_output_dir(GPURaytracing works/GPURaytracing)
 
+    set(_hm "${HONKORDGL_ROOT}/works/OpenGLHeightmap/Main.cpp")
+    honkordgl_private_app(OpenGLHeightmap _hm)
+    honkordgl_set_example_output_dir(OpenGLHeightmap works/OpenGLHeightmap)
+
     set(_spl "${HONKORDGL_ROOT}/works/SplitScreen/Main.cpp")
     honkordgl_private_app(SplitScreen _spl)
     honkordgl_set_example_output_dir(SplitScreen works/SplitScreen)
@@ -292,6 +298,7 @@ if(HONKORDGL_BUILD_EXAMPLES)
         honkordgl_xcode_pair_sources(Checkerboard works Checkerboard Main.cpp Checkerboard)
         honkordgl_xcode_pair_sources(AsteroidGame works AsteroidGame Main.cpp AsteroidGame)
         honkordgl_xcode_pair_sources(GPURaytracing works GPURaytracing Main.cpp GPURaytracing)
+        honkordgl_xcode_pair_sources(OpenGLHeightmap works OpenGLHeightmap Main.cpp OpenGLHeightmap)
         honkordgl_xcode_pair_sources(SplitScreen works SplitScreen Main.cpp SplitScreen)
         honkordgl_xcode_pair_sources(CameraPlayer works CameraPlayer Main.cpp CameraPlayer)
 

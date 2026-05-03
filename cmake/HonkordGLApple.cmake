@@ -7,6 +7,7 @@ set(HONKORDGL_CORE_APPLE
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
+    "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
     "${HONKORDGL_ROOT}/src/Camera.cpp"
     "${HONKORDGL_ROOT}/src/Sprite.cpp"

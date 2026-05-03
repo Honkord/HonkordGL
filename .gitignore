@@ -12,6 +12,7 @@ tests/Window/TestWindow
 tests/DrawSprite/TestSprite
 works/MovingSquare/MovingSquare
 works/GPURaytracing/GPURaytracing
+works/OpenGLHeightmap/OpenGLHeightmap
 works/Checkerboard/Checkerboard
 works/AsteroidGame/AsteroidGame
 works/Tetris/Tetris

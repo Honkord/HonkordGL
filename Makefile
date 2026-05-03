@@ -22,6 +22,7 @@ CORE_SRCS := \
  src/TextUI.cpp \
  src/GpuRenderer.cpp \
  src/GpuCapabilities.cpp \
+ src/OpenGlIntegration.cpp \
  src/GpuShaderCompiler.cpp \
  src/Camera.cpp \
  src/Sprite.cpp \
@@ -71,6 +72,7 @@ CORE_SRCS := \
  src/TextUI.cpp \
  src/GpuRenderer.cpp \
  src/GpuCapabilities.cpp \
+ src/OpenGlIntegration.cpp \
  src/GpuShaderCompiler.cpp \
  src/Camera.cpp \
  src/Sprite.cpp \
@@ -122,6 +124,7 @@ WORKS_BINS := \
  works/Checkerboard/Checkerboard$(EXE_EXT) \
  works/AsteroidGame/AsteroidGame$(EXE_EXT) \
  works/GPURaytracing/GPURaytracing$(EXE_EXT) \
+ works/OpenGLHeightmap/OpenGLHeightmap$(EXE_EXT) \
  works/SplitScreen/SplitScreen$(EXE_EXT) \
  works/CameraPlayer/CameraPlayer$(EXE_EXT) \
  works/ImGuiDemo/ImGuiDemo$(EXE_EXT) \
@@ -264,6 +267,9 @@ works/AsteroidGame/AsteroidGame$(EXE_EXT): works/AsteroidGame/Main.cpp lib
 works/GPURaytracing/GPURaytracing$(EXE_EXT): works/GPURaytracing/Main.cpp lib
 >$(CXX) $(CPPFLAGS) -std=c++17 $(WIN_STATIC_RUNTIME_FLAGS) "$<" -o "$@" $(LIB_USE_FLAGS) $(SYS_LIBS)
 
+works/OpenGLHeightmap/OpenGLHeightmap$(EXE_EXT): works/OpenGLHeightmap/Main.cpp lib
+>$(CXX) $(CPPFLAGS) -std=c++17 $(WIN_STATIC_RUNTIME_FLAGS) "$<" -o "$@" $(LIB_USE_FLAGS) $(SYS_LIBS)
+
 works/SplitScreen/SplitScreen$(EXE_EXT): works/SplitScreen/Main.cpp lib
 >$(CXX) $(CPPFLAGS) -std=c++17 $(WIN_STATIC_RUNTIME_FLAGS) "$<" -o "$@" $(LIB_USE_FLAGS) $(SYS_LIBS)
 
@@ -312,8 +318,8 @@ tests/Audio/TestAudioSmoke$(EXE_EXT): tests/Audio/TestAudioSmoke.cpp lib
 
 clean:
 >rm -rf build
->rm -f works/MovingSquare/MovingSquare works/Tetris/Tetris works/Checkerboard/Checkerboard works/AsteroidGame/AsteroidGame works/GPURaytracing/GPURaytracing works/SplitScreen/SplitScreen works/CameraPlayer/CameraPlayer works/ImGuiDemo/ImGuiDemo works/ImGuiSoftwareDemo/ImGuiSoftwareDemo works/NuklearDemo/NuklearDemo
->rm -f works/MovingSquare/MovingSquare.exe works/Tetris/Tetris.exe works/Checkerboard/Checkerboard.exe works/AsteroidGame/AsteroidGame.exe works/GPURaytracing/GPURaytracing.exe works/SplitScreen/SplitScreen.exe works/CameraPlayer/CameraPlayer.exe works/ImGuiDemo/ImGuiDemo.exe works/ImGuiSoftwareDemo/ImGuiSoftwareDemo.exe works/NuklearDemo/NuklearDemo.exe
+>rm -f works/MovingSquare/MovingSquare works/Tetris/Tetris works/Checkerboard/Checkerboard works/AsteroidGame/AsteroidGame works/GPURaytracing/GPURaytracing works/OpenGLHeightmap/OpenGLHeightmap works/SplitScreen/SplitScreen works/CameraPlayer/CameraPlayer works/ImGuiDemo/ImGuiDemo works/ImGuiSoftwareDemo/ImGuiSoftwareDemo works/NuklearDemo/NuklearDemo
+>rm -f works/MovingSquare/MovingSquare.exe works/Tetris/Tetris.exe works/Checkerboard/Checkerboard.exe works/AsteroidGame/AsteroidGame.exe works/GPURaytracing/GPURaytracing.exe works/OpenGLHeightmap/OpenGLHeightmap.exe works/SplitScreen/SplitScreen.exe works/CameraPlayer/CameraPlayer.exe works/ImGuiDemo/ImGuiDemo.exe works/ImGuiSoftwareDemo/ImGuiSoftwareDemo.exe works/NuklearDemo/NuklearDemo.exe
 >rm -f tests/Window/TestWindow tests/DrawSprite/TestSprite tests/DeferredRenderer/TestDeferredRenderer
 >rm -f tests/Audio/TestAudioSmoke tests/Window/TestWindow.exe tests/DrawSprite/TestSprite.exe tests/DeferredRenderer/TestDeferredRenderer.exe tests/Audio/TestAudioSmoke.exe
 >rm -f bundles/HonkordGL.o bundles/HonkordGL.obj

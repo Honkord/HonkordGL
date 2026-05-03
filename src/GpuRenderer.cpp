@@ -521,15 +521,15 @@ int GpuRenderer::LoadShaderCompilerProcs() noexcept
         return mc;
     return GpuShaderLoadCompilerProcs();
 }
-void * GpuRenderer::GetGraphicsProc(const char * name) noexcept
+void * RendererContextGetGraphicsProc(ApplicationContextSettings * app, const char * name) noexcept
 {
-    if (!name || !app_)
+    if (!name || !app)
         return nullptr;
 #if HONKORDGL_PLATFORM_WINDOWS
-    if (app_->active_renderer == static_cast<int>(Renderers::DIRECT3D))
+    if (app->active_renderer == static_cast<int>(Renderers::DIRECT3D))
         return nullptr;
 #endif
-    (void)MakeCurrent();
+    (void)RendererContextMakeCurrent(*app);
 #if HONKORDGL_PLATFORM_APPLE
     return dlsym(RTLD_DEFAULT, name);
 #elif HONKORDGL_GPU_RENDERER_OPENGL_ES
@@ -540,12 +540,19 @@ void * GpuRenderer::GetGraphicsProc(const char * name) noexcept
         return p;
     return reinterpret_cast<void *>(wglGetProcAddress(reinterpret_cast<LPCSTR>(name)));
 #elif HONKORDGL_PLATFORM_LINUX_DESKTOP
-    if (app_->active_renderer == static_cast<int>(Renderers::EGL) && app_->egl_display)
+    if (app->active_renderer == static_cast<int>(Renderers::EGL) && app->egl_display)
         return reinterpret_cast<void *>(eglGetProcAddress(name));
     return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
 #else
     return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
 #endif
+}
+
+void * GpuRenderer::GetGraphicsProc(const char * name) noexcept
+{
+    if (!app_)
+        return nullptr;
+    return RendererContextGetGraphicsProc(app_, name);
 }
 int GpuRenderer::GetAdapterString(GpuAdapterStringId which, char * buf, std::size_t bufBytes) noexcept
 {

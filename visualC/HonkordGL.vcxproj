@@ -40,6 +40,7 @@
     <ClCompile Include="..\src\TextUI.cpp" />
     <ClCompile Include="..\src\GpuRenderer.cpp" />
     <ClCompile Include="..\src\GpuCapabilities.cpp" />
+    <ClCompile Include="..\src\OpenGlIntegration.cpp" />
     <ClCompile Include="..\src\GpuShaderCompiler.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\Sprite.cpp" />

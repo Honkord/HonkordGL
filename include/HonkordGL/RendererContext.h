@@ -112,6 +112,14 @@ HONKORDGL_API int RendererContextMakeCurrent(ApplicationContextSettings& app) no
 /** Presents the current frame to the window / surface. */
 HONKORDGL_API void RendererContextSwapBuffers(ApplicationContextSettings& app) noexcept;
 
+/**
+ * Resolves a GL / GLES entry point for the active HonkordGL context (same rules as `GpuRenderer::GetGraphicsProc`).
+ * Requires a current context on the calling thread when the backend uses dynamic resolution (`MakeCurrent` first).
+ */
+HONKORDGL_API HONKORDGL_ND void * RendererContextGetGraphicsProc(
+    ApplicationContextSettings * app,
+    const char * name) noexcept;
+
 } // namespace HonkordGL::Graphics
 
 #endif
