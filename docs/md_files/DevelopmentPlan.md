@@ -2,11 +2,11 @@
 
 ## Exposing more hardware without leaking internal APIs and macros
 
-Goal: give user programmers access to more device capabilities (limits, optional features, queues, etc.) while keeping vendor SDKs, generated protocol code, and build-only macros out of the public include surface.
+Goal: give programmers access to more device capabilities (limits, optional features, queues, etc.) while keeping vendor SDKs, generated protocol code, and build-only macros out of the public include surface.
 
 ### Principles
 
-1. **Own the vocabulary** — Public API uses HonkordGL-owned enums, structs, and opaque handles (`GpuDeviceId`, texture/buffer handles, queue kinds). Implementations map these to Vulkan, D3D, GL, EGL, etc. only in translation units under `src/` (and related internal headers). Public headers do not include vendor SDK headers or `internal/` implementation details.
+1. **Own the vocabulary** — Public API uses its own enums, structs, and opaque handles (`GpuDeviceId`, texture/buffer handles, queue kinds). Implementations map these to Vulkan, D3D, GL, EGL, etc. only in translation units under `src/` (and related internal headers). Public headers do not include vendor SDK headers or `internal/` implementation details.
 
 2. **Capabilities instead of macros** — Do not expose `#define GL_MAX_*`, platform `#ifdef` ladders, or similar as part of the user contract. Prefer init-time or runtime structures such as `HardwareCaps` / `GpuLimits` (e.g. max texture dimension, alignment requirements, timestamp resolution). Populate them inside the implementation from whatever macros, extensions, or queries are needed.
 
