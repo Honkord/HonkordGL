@@ -1,0 +1,5 @@
+# Checkerboard — macOS (works/Checkerboard)
+Name: Checkerboard
+Description: Checkerboard example (works/Checkerboard)
+Version: 1.0.0
+Requires: HonkordGL

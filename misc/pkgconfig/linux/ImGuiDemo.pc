@@ -1,0 +1,5 @@
+# ImGuiDemo demo — toolchain linux
+Name: ImGuiDemo
+Description: Dear ImGui demo (works/ImGuiDemo)
+Version: 0.1.0
+Requires: HonkordGL

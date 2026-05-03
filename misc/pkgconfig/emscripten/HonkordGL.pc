@@ -1,0 +1,13 @@
+# HonkordGL — pkg-config (Emscripten / WebAssembly template)
+honkord_prefix=/usr/local
+libdir=${honkord_prefix}/lib
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL (Emscripten port — link flags depend on your Emscripten SDL / WebGL glue)
+Version: 1.0.0
+
+Libs: -L${libdir} -lHonkordGL
+Cflags: -I${includedir} -I${honkord_prefix}/third_party/HonkordGL_ImGui -I${honkord_prefix}/third_party/HonkordGL_Nuklear -I${honkord_prefix}/third_party/Nuklear
+
+Libs.private:

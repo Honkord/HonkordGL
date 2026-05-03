@@ -1,0 +1,5 @@
+# Tetris — macOS (works/Tetris)
+Name: Tetris
+Description: Tetris example (works/Tetris)
+Version: 1.0.0
+Requires: HonkordGL

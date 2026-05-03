@@ -1,0 +1,5 @@
+# GPURaytracing demo — toolchain linux
+Name: GPURaytracing
+Description: GPU ray tracing example (works/GPURaytracing)
+Version: 0.1.0
+Requires: HonkordGL

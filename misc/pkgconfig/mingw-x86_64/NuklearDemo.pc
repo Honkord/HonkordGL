@@ -1,0 +1,5 @@
+# NuklearDemo demo — toolchain mingw-x86_64
+Name: NuklearDemo
+Description: Nuklear demo (works/NuklearDemo)
+Version: 0.1.0
+Requires: HonkordGL

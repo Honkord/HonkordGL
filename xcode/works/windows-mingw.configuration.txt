@@ -1,0 +1,3 @@
+# works/ — Windows MinGW
+# Base: ../HonkordGL/windows-mingw.configuration.txt
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/mingw-x86_64

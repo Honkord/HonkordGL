@@ -1,0 +1,5 @@
+// HonkordGL library — macOS (attach to HonkordGL target in Xcode)
+#include "../platforms/Apple-common.xcconfig"
+SDKROOT = macosx
+MACOSX_DEPLOYMENT_TARGET = 11.0
+OTHER_LDFLAGS = $(inherited) -framework Cocoa -framework OpenGL -framework Metal -framework QuartzCore -framework CoreAudio -framework AudioToolbox -framework IOKit

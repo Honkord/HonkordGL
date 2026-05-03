@@ -1,0 +1,5 @@
+# TestAudioSmoke — macOS (tests/Audio)
+Name: TestAudioSmoke
+Description: Audio smoke test (tests/Audio)
+Version: 1.0.0
+Requires: HonkordGL

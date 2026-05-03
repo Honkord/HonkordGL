@@ -1,0 +1,2 @@
+# tests/ — Windows MinGW 32-bit
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/mingw-i686

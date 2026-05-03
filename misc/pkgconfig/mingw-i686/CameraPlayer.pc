@@ -1,0 +1,5 @@
+# CameraPlayer demo — toolchain mingw-i686
+Name: CameraPlayer
+Description: Camera player example (works/CameraPlayer)
+Version: 0.1.0
+Requires: HonkordGL

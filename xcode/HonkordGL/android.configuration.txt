@@ -1,0 +1,3 @@
+# HonkordGL — Android (NDK / Gradle native bridge)
+# Preset: cmake --preset android-ninja  (pass -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake)
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/android

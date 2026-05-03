@@ -1,0 +1,84 @@
+/**
+ * @author Honkord <https://github.com>
+ *
+ * HonkordGL — GPU renderer bound to an application / window context
+ * Copyright (C) 2026 Honkord
+ */
+
+#ifndef HONKORDGL_TEXTUI_H
+#define HONKORDGL_TEXTUI_H
+
+#include <HonkordGL/Config.h>
+#include <HonkordGL/GpuRenderer.h>
+#include <HonkordGL/WindowApplication.h>
+
+namespace HonkordGL
+{
+namespace Events
+{
+struct Event;
+}
+} // namespace HonkordGL
+
+namespace HonkordGL::Graphics
+{
+
+class Software2DContext;
+
+/**
+ * Binds the text renderer to the window’s display (`ApplicationContextSettings`) and GPU path.
+ * Call after the window exists and `GpuRenderer` has a shading backend (e.g. `CreateBestAvailableShaderBackend`).
+ * Mutually exclusive with `TextUIBindSoftware2D`.
+ */
+HONKORDGL_API int TextUIBindDisplay(GpuRenderer & gpu, ApplicationContextSettings & app) noexcept;
+
+/**
+ * Binds the text renderer to a CPU `Software2DContext` (same baked font and layout as the GPU path).
+ * Mutually exclusive with `TextUIBindDisplay`. `app.frame_buffer_width` / `frame_buffer_height` should match `surface` dimensions.
+ */
+HONKORDGL_API int TextUIBindSoftware2D(ApplicationContextSettings & app, Software2DContext & surface) noexcept;
+
+/**
+ * Begins a text batch. Only between `TextUIBegin` and `TextUIEnd` may you call
+ * `TextUINextColor`, `TextUITextSize`, `TextUITextRect`, `TextUINextTextMovable`, `TextUINextTextFixed`, and `TextUIDraw`.
+ */
+HONKORDGL_API void TextUIBegin() noexcept;
+
+/** Ends the text batch (pairs `TextUIBegin`). */
+HONKORDGL_API void TextUIEnd() noexcept;
+
+/** Sets the RGBA tint (0..1) for the next `TextUIDraw` only. Valid only between Begin/End. */
+HONKORDGL_API void TextUINextColor(float r, float g, float b, float a) noexcept;
+
+/** Sets the em height in pixels for the next `TextUIDraw`. Valid only between Begin/End. */
+HONKORDGL_API void TextUITextSize(float heightPixels) noexcept;
+
+/**
+ * Sets the layout rectangle in client pixels (top-left origin, y increases downward).
+ * The next `TextUIDraw` lays out within this box. Valid only between Begin/End.
+ */
+HONKORDGL_API void TextUITextRect(float x, float y, float width, float height) noexcept;
+
+/** The next `TextUIDraw` may be dragged with the left mouse button held. Valid only between Begin/End. */
+HONKORDGL_API void TextUINextTextMovable() noexcept;
+
+/** The next `TextUIDraw` is not draggable (default). Valid only between Begin/End. */
+HONKORDGL_API void TextUINextTextFixed() noexcept;
+
+/**
+ * Draws UTF-8 text (ASCII / Latin-1 subset). Uses the current per-draw color, size, rect, and mobility.
+ * Valid only between Begin/End.
+ */
+HONKORDGL_API void TextUIDraw(const char * utf8Text) noexcept;
+
+/**
+ * Processes input for movable strings (same `app` as `TextUIBindDisplay` / `TextUIBindSoftware2D`). Call from your event loop.
+ */
+HONKORDGL_API void TextUIProcessEvent(ApplicationContextSettings & app, HonkordGL::Events::Event const & ev) noexcept;
+
+/** Releases GPU resources and CPU font atlas state. Safe to call once at shutdown. */
+HONKORDGL_API void TextUIShutdown() noexcept;
+
+} // namespace HonkordGL::Graphics
+
+#endif

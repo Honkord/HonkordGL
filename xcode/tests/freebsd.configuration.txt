@@ -1,0 +1,2 @@
+# tests/ — FreeBSD
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux

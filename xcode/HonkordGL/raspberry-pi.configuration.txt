@@ -1,0 +1,2 @@
+# HonkordGL — Raspberry Pi OS (X11; optional HONKORDGL_PLATFORM_RASPBERRY_PI)
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux

@@ -1,0 +1,3 @@
+# works/ — Android
+# Base: ../HonkordGL/android.configuration.txt
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/android

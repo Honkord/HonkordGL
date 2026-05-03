@@ -1,0 +1,2 @@
+# tests/ — Windows MinGW
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/mingw-x86_64

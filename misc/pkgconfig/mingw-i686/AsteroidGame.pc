@@ -1,0 +1,5 @@
+# AsteroidGame demo — toolchain mingw-i686
+Name: AsteroidGame
+Description: Asteroid game example (works/AsteroidGame)
+Version: 0.1.0
+Requires: HonkordGL

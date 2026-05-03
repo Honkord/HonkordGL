@@ -1,0 +1,167 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "linux-ninja-debug",
+      "displayName": "Linux — Ninja — Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-ninja-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HONKORDGL_BUILD_EXAMPLES": "ON",
+        "HONKORDGL_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "linux-ninja-release",
+      "displayName": "Linux — Ninja — Release",
+      "inherits": "linux-ninja-debug",
+      "binaryDir": "${sourceDir}/build/linux-ninja-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-mingw64-ninja",
+      "displayName": "Windows — MinGW-w64 — Ninja",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-mingw64-ninja",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-x86_64.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "HONKORDGL_BUILD_EXAMPLES": "ON",
+        "HONKORDGL_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "windows-mingw32-ninja",
+      "displayName": "Windows — MinGW-w32 — Ninja",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-mingw32-ninja",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-i686.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "HONKORDGL_BUILD_EXAMPLES": "ON",
+        "HONKORDGL_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "macos-xcode",
+      "displayName": "macOS — Xcode",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/macos-xcode",
+      "cacheVariables": {
+        "HONKORDGL_BUILD_EXAMPLES": "ON",
+        "HONKORDGL_BUILD_TESTS": "ON",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0"
+      }
+    },
+    {
+      "name": "macos-ninja-debug",
+      "displayName": "macOS — Ninja — Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-ninja-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HONKORDGL_BUILD_EXAMPLES": "ON",
+        "HONKORDGL_BUILD_TESTS": "ON",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0"
+      }
+    },
+    {
+      "name": "ios-xcode",
+      "displayName": "iOS — Xcode (toolchain / port may be required)",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/ios-xcode",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_SYSROOT": "iphoneos",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "14.0",
+        "HONKORDGL_BUILD_EXAMPLES": "OFF",
+        "HONKORDGL_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "ios-simulator-xcode",
+      "displayName": "iOS Simulator — Xcode",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/ios-simulator-xcode",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_SYSROOT": "iphonesimulator",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "14.0",
+        "HONKORDGL_BUILD_EXAMPLES": "OFF",
+        "HONKORDGL_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "android-ninja",
+      "displayName": "Android — Ninja (NDK toolchain required)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/android-ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "HONKORDGL_BUILD_EXAMPLES": "OFF",
+        "HONKORDGL_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "emscripten-ninja",
+      "displayName": "Emscripten — Ninja (toolchain required)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/emscripten-ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "HONKORDGL_BUILD_EXAMPLES": "OFF",
+        "HONKORDGL_BUILD_TESTS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-ninja-debug",
+      "configurePreset": "linux-ninja-debug"
+    },
+    {
+      "name": "linux-ninja-release",
+      "configurePreset": "linux-ninja-release"
+    },
+    {
+      "name": "windows-mingw64-ninja",
+      "configurePreset": "windows-mingw64-ninja"
+    },
+    {
+      "name": "windows-mingw32-ninja",
+      "configurePreset": "windows-mingw32-ninja"
+    },
+    {
+      "name": "macos-xcode",
+      "configurePreset": "macos-xcode"
+    },
+    {
+      "name": "macos-ninja-debug",
+      "configurePreset": "macos-ninja-debug"
+    },
+    {
+      "name": "ios-xcode",
+      "configurePreset": "ios-xcode"
+    },
+    {
+      "name": "ios-simulator-xcode",
+      "configurePreset": "ios-simulator-xcode"
+    },
+    {
+      "name": "android-ninja",
+      "configurePreset": "android-ninja"
+    },
+    {
+      "name": "emscripten-ninja",
+      "configurePreset": "emscripten-ninja"
+    }
+  ]
+}

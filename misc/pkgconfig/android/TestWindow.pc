@@ -1,0 +1,5 @@
+# TestWindow test — toolchain android
+Name: TestWindow
+Description: HonkordGL test (tests/Window)
+Version: 0.1.0
+Requires: HonkordGL

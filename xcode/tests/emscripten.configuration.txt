@@ -1,0 +1,2 @@
+# tests/ — Emscripten
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/emscripten

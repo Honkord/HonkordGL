@@ -1,0 +1,3 @@
+# HonkordGL — FreeBSD (X11 stack; same layout as Linux desktop in tree)
+# Build: configure like Linux with BSD window sources enabled in your toolchain.
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux

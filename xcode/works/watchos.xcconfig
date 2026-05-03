@@ -1,0 +1,2 @@
+// works examples — watchOS
+#include "../HonkordGL/watchos.xcconfig"

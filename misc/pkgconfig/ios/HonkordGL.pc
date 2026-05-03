@@ -1,0 +1,13 @@
+# HonkordGL — pkg-config (iOS template; many consumers use Xcode instead of pkg-config)
+honkord_prefix=/usr/local
+libdir=${honkord_prefix}/lib
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL (iOS — UIKit / Metal / GLES; adjust Libs for your SDK)
+Version: 1.0.0
+
+Libs: -L${libdir} -lHonkordGL
+Cflags: -I${includedir} -I${honkord_prefix}/third_party/HonkordGL_ImGui -I${honkord_prefix}/third_party/HonkordGL_Nuklear -I${honkord_prefix}/third_party/Nuklear
+
+Libs.private: -framework UIKit -framework Metal -framework QuartzCore -framework AudioToolbox -framework CoreGraphics

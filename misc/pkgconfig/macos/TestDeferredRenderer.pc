@@ -1,0 +1,5 @@
+# TestDeferredRenderer — macOS (tests/DeferredRenderer)
+Name: TestDeferredRenderer
+Description: Deferred renderer test (tests/DeferredRenderer)
+Version: 1.0.0
+Requires: HonkordGL

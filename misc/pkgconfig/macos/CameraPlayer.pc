@@ -1,0 +1,5 @@
+# CameraPlayer — macOS (works/CameraPlayer)
+Name: CameraPlayer
+Description: Camera player example (works/CameraPlayer)
+Version: 1.0.0
+Requires: HonkordGL

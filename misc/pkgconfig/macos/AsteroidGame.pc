@@ -1,0 +1,5 @@
+# AsteroidGame — macOS (works/AsteroidGame)
+Name: AsteroidGame
+Description: Asteroids-style example (works/AsteroidGame)
+Version: 1.0.0
+Requires: HonkordGL

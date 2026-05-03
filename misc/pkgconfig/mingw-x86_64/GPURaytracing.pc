@@ -1,0 +1,5 @@
+# GPURaytracing demo — toolchain mingw-x86_64
+Name: GPURaytracing
+Description: GPU ray tracing example (works/GPURaytracing)
+Version: 0.1.0
+Requires: HonkordGL

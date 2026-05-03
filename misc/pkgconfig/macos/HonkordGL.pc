@@ -1,0 +1,14 @@
+# HonkordGL — pkg-config (macOS)
+# Default prefix matches a typical Homebrew / local install; override with PKG_CONFIG_PATH or --define-prefix.
+honkord_prefix=/usr/local
+libdir=${honkord_prefix}/lib
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL windowing and rendering library (macOS: Cocoa, Metal, OpenGL, CoreAudio)
+Version: 1.0.0
+
+Libs: -L${libdir} -lHonkordGL
+Cflags: -I${includedir} -I${honkord_prefix}/third_party/HonkordGL_ImGui -I${honkord_prefix}/third_party/HonkordGL_Nuklear -I${honkord_prefix}/third_party/Nuklear
+
+Libs.private: -framework Cocoa -framework OpenGL -framework Metal -framework QuartzCore -framework CoreAudio -framework AudioToolbox -framework IOKit

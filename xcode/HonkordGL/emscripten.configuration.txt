@@ -1,0 +1,3 @@
+# HonkordGL — Emscripten / WebAssembly
+# Preset: cmake --preset emscripten-ninja  (pass -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake or emcmake)
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/emscripten

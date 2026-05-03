@@ -1,0 +1,2 @@
+// tests/ — macOS
+#include "../HonkordGL/macos.xcconfig"

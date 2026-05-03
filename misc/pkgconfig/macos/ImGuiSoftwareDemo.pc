@@ -1,0 +1,5 @@
+# ImGuiSoftwareDemo — macOS (works/ImGuiSoftwareDemo)
+Name: ImGuiSoftwareDemo
+Description: Dear ImGui software renderer demo (works/ImGuiSoftwareDemo)
+Version: 1.0.0
+Requires: HonkordGL

@@ -1,0 +1,5 @@
+# Tetris demo — toolchain mingw-i686
+Name: Tetris
+Description: Tetris example (works/Tetris)
+Version: 0.1.0
+Requires: HonkordGL

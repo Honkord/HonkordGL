@@ -1,0 +1,5 @@
+# MovingSquare demo — toolchain mingw-x86_64
+Name: MovingSquare
+Description: Moving square example (works/MovingSquare)
+Version: 0.1.0
+Requires: HonkordGL

@@ -1,0 +1,2 @@
+// works examples — macOS (inherits HonkordGL frameworks / deployment)
+#include "../HonkordGL/macos.xcconfig"

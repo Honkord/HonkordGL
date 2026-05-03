@@ -1,0 +1,11 @@
+# HonkordGL — pkg-config (MinGW-w64 x86_64)
+honkord_prefix=/usr/local
+libdir=${honkord_prefix}/lib
+includedir=${honkord_prefix}/include
+
+Name: HonkordGL
+Description: HonkordGL windowing and rendering library (Windows via MinGW-w64 x86_64)
+Version: 0.1.0
+
+Libs: -L${libdir} -lHonkordGL -luser32 -lgdi32 -lwinmm -lole32 -lws2_32 -lopengl32 -ld3d11 -ldxgi -ld3dcompiler
+Cflags: -I${includedir} -I${honkord_prefix}/third_party/HonkordGL_ImGui -I${honkord_prefix}/third_party/HonkordGL_Nuklear -I${honkord_prefix}/third_party/Nuklear

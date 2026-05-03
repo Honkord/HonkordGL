@@ -1,0 +1,4 @@
+// HonkordGL library — watchOS (template; windowing stack not applicable)
+#include "../platforms/Apple-common.xcconfig"
+SDKROOT = watchos
+WATCHOS_DEPLOYMENT_TARGET = 8.0

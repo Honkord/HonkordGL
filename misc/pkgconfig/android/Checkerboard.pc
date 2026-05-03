@@ -1,0 +1,5 @@
+# Checkerboard demo — toolchain android
+Name: Checkerboard
+Description: Checkerboard example (works/Checkerboard)
+Version: 0.1.0
+Requires: HonkordGL

@@ -1,0 +1,4 @@
+# works/ — Linux
+# Base: ../HonkordGL/linux.configuration.txt
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux
+# Example: pkg-config --cflags --libs MovingSquare

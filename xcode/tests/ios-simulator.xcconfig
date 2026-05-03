@@ -1,0 +1,2 @@
+// tests/ — iOS Simulator
+#include "../HonkordGL/ios-simulator.xcconfig"

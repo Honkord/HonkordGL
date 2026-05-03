@@ -1,0 +1,5 @@
+// HonkordGL library — tvOS (template)
+#include "../platforms/Apple-common.xcconfig"
+SDKROOT = appletvos
+TVOS_DEPLOYMENT_TARGET = 14.0
+OTHER_LDFLAGS = $(inherited) -framework Metal -framework QuartzCore

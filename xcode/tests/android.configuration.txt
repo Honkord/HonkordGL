@@ -1,0 +1,2 @@
+# tests/ — Android
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/android

@@ -1,0 +1,3 @@
+# HonkordGL — Windows via MSVC (Visual Studio projects under visualC/)
+# Open visualC/HonkordGL.vcxproj or visualC_gdk/HonkordGL.vcxproj
+# For pkg-config style flags when using a third-party .pc consumer, see mingw-x86_64 as a reference for link lines.

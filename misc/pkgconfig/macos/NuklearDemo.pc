@@ -1,0 +1,5 @@
+# NuklearDemo — macOS (works/NuklearDemo)
+Name: NuklearDemo
+Description: Nuklear UI demo (works/NuklearDemo)
+Version: 1.0.0
+Requires: HonkordGL
