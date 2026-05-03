@@ -1,0 +1,87 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/cursor-shape-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/cursor-shape-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/cursor-shape-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/fractional-scale-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/fractional-scale-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/fractional-scale-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/linux-drm-syncobj-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/linux-drm-syncobj-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/linux-drm-syncobj-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/single-pixel-buffer-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/single-pixel-buffer-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/single-pixel-buffer-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/tablet-v2-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/tablet-v2-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/tablet-v2-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/text-input-v3-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/text-input-v3-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/text-input-v3-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/viewporter-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/viewporter-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/viewporter-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-activation-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-activation-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-activation-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-decoration-unstable-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-decoration-unstable-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-decoration-unstable-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-dialog-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-dialog-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-dialog-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-foreign-unstable-v2-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-foreign-unstable-v2-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-foreign-unstable-v2-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-shell-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-shell-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-shell-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-toplevel-icon-v1-protocol.c" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-toplevel-icon-v1-protocol.c.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/generated/xdg-toplevel-icon-v1-protocol.c.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Audio/AudioAlsa.cpp" "CMakeFiles/HonkordGL.dir/src/Audio/AudioAlsa.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Audio/AudioAlsa.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Audio/AudioDecodeCommon.cpp" "CMakeFiles/HonkordGL.dir/src/Audio/AudioDecodeCommon.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Audio/AudioDecodeCommon.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Audio/AudioFeatures.cpp" "CMakeFiles/HonkordGL.dir/src/Audio/AudioFeatures.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Audio/AudioFeatures.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Camera.cpp" "CMakeFiles/HonkordGL.dir/src/Camera.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Camera.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/DRM/EventsDRM.cpp" "CMakeFiles/HonkordGL.dir/src/DRM/EventsDRM.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/DRM/EventsDRM.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/DeferredRendererSample.cpp" "CMakeFiles/HonkordGL.dir/src/DeferredRendererSample.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/DeferredRendererSample.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Eclipse.cpp" "CMakeFiles/HonkordGL.dir/src/Eclipse.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Eclipse.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/GpuCapabilities.cpp" "CMakeFiles/HonkordGL.dir/src/GpuCapabilities.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/GpuCapabilities.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/GpuRenderer.cpp" "CMakeFiles/HonkordGL.dir/src/GpuRenderer.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/GpuRenderer.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/GpuShaderCompiler.cpp" "CMakeFiles/HonkordGL.dir/src/GpuShaderCompiler.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/GpuShaderCompiler.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Joystick/Joystick.cpp" "CMakeFiles/HonkordGL.dir/src/Joystick/Joystick.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Joystick/Joystick.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Lines.cpp" "CMakeFiles/HonkordGL.dir/src/Lines.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Lines.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Software2DContext.cpp" "CMakeFiles/HonkordGL.dir/src/Software2DContext.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Software2DContext.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/SoftwareBlitCollector.cpp" "CMakeFiles/HonkordGL.dir/src/SoftwareBlitCollector.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/SoftwareBlitCollector.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/SoftwareRenderer.cpp" "CMakeFiles/HonkordGL.dir/src/SoftwareRenderer.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/SoftwareRenderer.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Sprite.cpp" "CMakeFiles/HonkordGL.dir/src/Sprite.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Sprite.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/TextUI.cpp" "CMakeFiles/HonkordGL.dir/src/TextUI.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/TextUI.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Video.cpp" "CMakeFiles/HonkordGL.dir/src/Video.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Video.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/EGLRendererContextWayland.cpp" "CMakeFiles/HonkordGL.dir/src/Wayland/EGLRendererContextWayland.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/EGLRendererContextWayland.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/EventsWayland.cpp" "CMakeFiles/HonkordGL.dir/src/Wayland/EventsWayland.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/EventsWayland.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/IpcWayland.cpp" "CMakeFiles/HonkordGL.dir/src/Wayland/IpcWayland.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/IpcWayland.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/PlatformSession.cpp" "CMakeFiles/HonkordGL.dir/src/Wayland/PlatformSession.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/PlatformSession.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/WindowBackend.cpp" "CMakeFiles/HonkordGL.dir/src/Wayland/WindowBackend.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/Wayland/WindowBackend.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/WindowBackend.cpp" "CMakeFiles/HonkordGL.dir/src/WindowBackend.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/WindowBackend.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/CursorX11.cpp" "CMakeFiles/HonkordGL.dir/src/X11/CursorX11.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/CursorX11.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/EGLRendererContextX11.cpp" "CMakeFiles/HonkordGL.dir/src/X11/EGLRendererContextX11.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/EGLRendererContextX11.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/EventsX11.cpp" "CMakeFiles/HonkordGL.dir/src/X11/EventsX11.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/EventsX11.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/GLXRendererContext.cpp" "CMakeFiles/HonkordGL.dir/src/X11/GLXRendererContext.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/GLXRendererContext.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/IpcHelperWindow.cpp" "CMakeFiles/HonkordGL.dir/src/X11/IpcHelperWindow.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/IpcHelperWindow.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/MonitorsX11.cpp" "CMakeFiles/HonkordGL.dir/src/X11/MonitorsX11.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/MonitorsX11.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/RandrMonitorPoll.cpp" "CMakeFiles/HonkordGL.dir/src/X11/RandrMonitorPoll.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/RandrMonitorPoll.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/X11/WindowBackend.cpp" "CMakeFiles/HonkordGL.dir/src/X11/WindowBackend.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/X11/WindowBackend.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/internal/DeferredRendererGpuApi.cpp" "CMakeFiles/HonkordGL.dir/src/internal/DeferredRendererGpuApi.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/src/internal/DeferredRendererGpuApi.cpp.o.d"
+  "/home/dasd/Projects/Libraries/HonkordGL/works/AsteroidGame/VulkanNoop.cpp" "CMakeFiles/HonkordGL.dir/works/AsteroidGame/VulkanNoop.cpp.o" "gcc" "CMakeFiles/HonkordGL.dir/works/AsteroidGame/VulkanNoop.cpp.o.d"
+  )
+
+# Pairs of files generated by the same build rule.
+set(CMAKE_MULTIPLE_OUTPUT_PAIRS
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/cursor-shape-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/cursor-shape-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/fractional-scale-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/fractional-scale-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/linux-drm-syncobj-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/linux-drm-syncobj-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/single-pixel-buffer-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/single-pixel-buffer-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/tablet-v2-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/tablet-v2-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/text-input-v3-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/text-input-v3-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/viewporter-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/viewporter-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-activation-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-activation-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-decoration-unstable-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-decoration-unstable-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-dialog-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-dialog-v1-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-foreign-unstable-v2-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-foreign-unstable-v2-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-shell-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-shell-client-protocol.h"
+  "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-toplevel-icon-v1-protocol.c" "/home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-toplevel-icon-v1-client-protocol.h"
+  )
+
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

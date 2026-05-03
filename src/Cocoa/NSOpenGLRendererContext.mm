@@ -90,6 +90,11 @@ int OpenGLProfileAttribute(const RendererContextSettings& spec) noexcept
 
 int AttachRendererContext(ApplicationContextSettings& app, const RendererContextSettings& spec) noexcept
 {
+    {
+        const int vr = ValidateRendererDeviceRequest(spec);
+        if (vr != static_cast<int>(RendererContextResult::OK))
+            return vr;
+    }
     if (spec.backend == Renderers::METAL)
         return Internal::AttachRendererContextMetal(app, spec);
 

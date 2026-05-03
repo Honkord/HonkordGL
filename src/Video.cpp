@@ -84,6 +84,7 @@ void Window::CreateWindow() noexcept
             if (!impl_->be().Initialize(nullptr))
                 return;
         }
+	 
         impl_->backend_initialized = true;
     }
     if (impl_->settings.client_rect.w <= 0 || impl_->settings.client_rect.z <= 0)

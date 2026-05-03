@@ -11,11 +11,16 @@
 
 #include <HonkordGL/Config.h>
 
+#include <cstdint>
+
 typedef HONKORDGL_API struct HonkordGL_Renderer HonkordGL_Renderer; 
 namespace HonkordGL 
 {
 namespace Graphics 
 {
+    /** Opaque pointer passed to `ApplicationContextSettings::gpu_frame_hook` (library-defined layout in `src/`). */
+    struct HonkordGlGpuOpaqueContext;
+
     //////////////////////////////////////////////////////
     typedef void * HonkordGL_GW_Handle;
     
@@ -121,6 +126,15 @@ namespace Graphics
         void (*ResizeCallback)(struct ApplicationContextSettings * ctx, int w, int h);
         void (*PresentCallback)(struct ApplicationContextSettings * ctx);
         void (*DestroyCallback)(struct ApplicationContextSettings * ctx);
+
+        /**
+         * Optional per-frame hook after `GpuRenderer::SwapBuffers` / `RendererContextSwapBuffers` (same thread).
+         * Receives only `HonkordGlGpuOpaqueContext*` and `user_data` — not native device or command-list pointers.
+         */
+        void (*gpu_frame_hook)(HonkordGlGpuOpaqueContext * opaque, void * user_data){nullptr};
+        void * gpu_frame_hook_user_data{nullptr};
+        /** Bit mask of `GpuOptionalFeature` values acknowledged via `TryEnableGpuOptionalFeature`. */
+        std::uint64_t gpu_optional_features_enabled_mask{0};
 
         ApplicationContextSettings() noexcept = default;
         ApplicationContextSettings(const ApplicationContextSettings& other) noexcept = default;

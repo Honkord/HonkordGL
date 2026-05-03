@@ -87,6 +87,11 @@ int AttachRendererContext(ApplicationContextSettings& app, const RendererContext
         SetInternalApiError("AttachRendererContext: native platform is not Android.");
         return static_cast<int>(RendererContextResult::UNSUPPORTED_PLATFORM);
     }
+    {
+        const int vr = ValidateRendererDeviceRequest(spec);
+        if (vr != static_cast<int>(RendererContextResult::OK))
+            return vr;
+    }
     if (app.device != nullptr || app.egl_display != nullptr || app.active_renderer != 0)
         DetachRendererContext(app);
 

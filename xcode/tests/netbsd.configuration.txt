@@ -1,0 +1,2 @@
+# tests/ — NetBSD
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux

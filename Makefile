@@ -21,6 +21,7 @@ CORE_SRCS := \
  src/SoftwareRenderer.cpp \
  src/TextUI.cpp \
  src/GpuRenderer.cpp \
+ src/GpuCapabilities.cpp \
  src/GpuShaderCompiler.cpp \
  src/Camera.cpp \
  src/Sprite.cpp \
@@ -69,6 +70,7 @@ CORE_SRCS := \
  src/SoftwareRenderer.cpp \
  src/TextUI.cpp \
  src/GpuRenderer.cpp \
+ src/GpuCapabilities.cpp \
  src/GpuShaderCompiler.cpp \
  src/Camera.cpp \
  src/Sprite.cpp \

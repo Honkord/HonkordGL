@@ -119,6 +119,12 @@ int AttachRendererContext(ApplicationContextSettings& app, const RendererContext
         return static_cast<int>(RendererContextResult::UNSUPPORTED_PLATFORM);
     }
 
+    {
+        const int vr = ValidateRendererDeviceRequest(spec);
+        if (vr != static_cast<int>(RendererContextResult::OK))
+            return vr;
+    }
+
     if (app.device != nullptr || app.active_renderer != 0)
         DetachRendererContext(app);
 

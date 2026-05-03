@@ -1,0 +1,5 @@
+// Shared HonkordGL settings for Apple SDKs (include from HonkordGL/*.xcconfig)
+CLANG_CXX_LANGUAGE_STANDARD = c++17
+CLANG_CXX_LIBRARY = libc++
+GCC_C_LANGUAGE_STANDARD = gnu11
+ALWAYS_SEARCH_USER_PATHS = NO

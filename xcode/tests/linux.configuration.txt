@@ -1,0 +1,3 @@
+# tests/ — Linux
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux
+# Example: pkg-config --cflags --libs TestWindow

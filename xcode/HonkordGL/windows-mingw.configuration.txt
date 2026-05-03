@@ -1,0 +1,4 @@
+# HonkordGL — Windows via MinGW (CMake + Ninja)
+# Preset: cmake --preset windows-mingw64-ninja
+# pkg-config (Fedora MSYS2, etc.):
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/mingw-x86_64

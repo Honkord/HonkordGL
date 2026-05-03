@@ -1,0 +1,5 @@
+# TestWindow — macOS (tests/Window)
+Name: TestWindow
+Description: Window smoke test (tests/Window)
+Version: 1.0.0
+Requires: HonkordGL

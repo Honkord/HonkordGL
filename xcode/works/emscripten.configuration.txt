@@ -1,0 +1,3 @@
+# works/ — Emscripten
+# Base: ../HonkordGL/emscripten.configuration.txt
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/emscripten

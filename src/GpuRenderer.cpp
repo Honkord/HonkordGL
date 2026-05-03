@@ -6,6 +6,7 @@
  */
 
 #include <HonkordGL/GpuRenderer.h>
+#include <HonkordGL/GpuCapabilities.h>
 #include <HonkordGL/GpuShaderCompiler.h>
 #include <HonkordGL/PlatformAdapter.h>
 #include <HonkordGL/WindowApplication.h>
@@ -43,7 +44,26 @@
 
 namespace HonkordGL::Graphics {
 
+/** Completes the forward declaration in `WindowApplication.h` (opaque to callers). */
+struct HonkordGlGpuOpaqueContext {
+    ApplicationContextSettings * app;
+};
+
 namespace {
+
+GLenum GpuAdapterStringIdToGLenum(GpuAdapterStringId which) noexcept
+{
+    switch (which) {
+    case GpuAdapterStringId::Vendor:
+        return GL_VENDOR;
+    case GpuAdapterStringId::Renderer:
+        return GL_RENDERER;
+    case GpuAdapterStringId::Version:
+        return GL_VERSION;
+    default:
+        return 0;
+    }
+}
 
 bool GlslGpuPathOk(ApplicationContextSettings const * app) noexcept
 {
@@ -211,6 +231,12 @@ int GpuRenderer::Create(const RendererContextSettings& spec) noexcept
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     if (!app_->window_handle)
         return static_cast<int>(RendererContextResult::NO_WINDOW);
+
+    {
+        const int vr = ValidateRendererDeviceRequest(spec);
+        if (vr != static_cast<int>(RendererContextResult::OK))
+            return vr;
+    }
 
     if (owns_attachment_)
         Destroy();
@@ -403,6 +429,26 @@ void GpuRenderer::SwapBuffers() noexcept
     if (!app_)
         return;
     RendererContextSwapBuffers(*app_);
+    if (app_->gpu_frame_hook) {
+        HonkordGlGpuOpaqueContext opaque{};
+        opaque.app = app_;
+        app_->gpu_frame_hook(&opaque, app_->gpu_frame_hook_user_data);
+    }
+}
+
+int GpuRenderer::QueryHardwareLimits(GpuLimits * out_limits) noexcept
+{
+    return QueryGpuLimits(app_, out_limits);
+}
+
+int GpuRenderer::TryEnableOptionalFeature(GpuOptionalFeature feature) noexcept
+{
+    return TryEnableGpuOptionalFeature(app_, feature);
+}
+
+bool GpuRenderer::IsOptionalFeatureEnabled(GpuOptionalFeature feature) const noexcept
+{
+    return GpuOptionalFeatureIsEnabled(app_, feature);
 }
 void GpuRenderer::SetDefaultViewport() noexcept
 {
@@ -511,7 +557,10 @@ int GpuRenderer::GetAdapterString(GpuAdapterStringId which, char * buf, std::siz
     const int mc = MakeCurrent();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
-    const GLubyte * const s = glGetString(static_cast<GLenum>(which));
+    const GLenum name = GpuAdapterStringIdToGLenum(which);
+    if (name == 0)
+        return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
+    const GLubyte * const s = glGetString(name);
     if (!s)
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     std::strncpy(buf, reinterpret_cast<const char *>(s), bufBytes - 1);

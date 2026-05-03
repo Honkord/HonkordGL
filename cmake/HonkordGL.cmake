@@ -13,6 +13,7 @@ set(HONKORDGL_CORE_LINUX
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
     "${HONKORDGL_ROOT}/src/Camera.cpp"
     "${HONKORDGL_ROOT}/src/Sprite.cpp"
@@ -52,6 +53,7 @@ set(HONKORDGL_CORE_WINDOWS
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
     "${HONKORDGL_ROOT}/src/Camera.cpp"
     "${HONKORDGL_ROOT}/src/Sprite.cpp"
@@ -79,6 +81,8 @@ if(WIN32)
     add_library(HonkordGL ${HONKORDGL_CORE_WINDOWS} ${HONKORDGL_PLATFORM_WINDOWS})
     target_link_libraries(HonkordGL PRIVATE user32 gdi32 winmm ole32 ws2_32 d3d11 dxgi d3dcompiler)
     target_link_libraries(HonkordGL PUBLIC opengl32)
+elseif(APPLE)
+    include("${CMAKE_CURRENT_LIST_DIR}/HonkordGLApple.cmake")
 elseif(UNIX AND NOT APPLE AND NOT ANDROID)
     find_program(HONKORDGL_WAYLAND_SCANNER NAMES wayland-scanner)
     if(HONKORDGL_USE_BUNDLED_WAYLAND_PROTOCOLS OR NOT HONKORDGL_WAYLAND_SCANNER)
@@ -99,7 +103,7 @@ elseif(UNIX AND NOT APPLE AND NOT ANDROID)
         asound dl pthread m)
     target_link_libraries(HonkordGL PUBLIC EGL GL)
 else()
-    message(FATAL_ERROR "HonkordGL CMake currently supports Windows and Linux desktop only.")
+    message(FATAL_ERROR "HonkordGL CMake currently supports Windows, Linux desktop, and macOS (Apple) only.")
 endif()
 
 target_include_directories(HonkordGL
@@ -126,6 +130,21 @@ if(MINGW)
         "$<$<COMPILE_LANGUAGE:CXX>:-static-libgcc;-static-libstdc++>")
 endif()
 
+# Xcode: pair each executable’s primary source with its misc/pkgconfig/macos/*.pc in the Project Navigator.
+function(honkordgl_xcode_pair_sources target group_prefix subdir main_filename pc_basename)
+    if(NOT APPLE OR NOT CMAKE_GENERATOR MATCHES "Xcode")
+        return()
+    endif()
+    set(_main "${HONKORDGL_ROOT}/${group_prefix}/${subdir}/${main_filename}")
+    set(_pc "${HONKORDGL_ROOT}/misc/pkgconfig/macos/${pc_basename}.pc")
+    if(NOT EXISTS "${_pc}")
+        return()
+    endif()
+    target_sources(${target} PRIVATE "${_pc}")
+    set_source_files_properties("${_pc}" PROPERTIES HEADER_FILE_ONLY ON)
+    source_group("${group_prefix}/${subdir}" FILES "${_main}" "${_pc}")
+endfunction()
+
 function(honkordgl_private_app name sources_var)
     add_executable("${name}" ${${sources_var}})
     target_include_directories("${name}" PRIVATE
@@ -143,6 +162,12 @@ function(honkordgl_private_app name sources_var)
                 "$<TARGET_FILE:HonkordGL>"
                 "$<TARGET_FILE_DIR:${name}>")
     endif()
+    if(APPLE AND BUILD_SHARED_LIBS)
+        add_custom_command(TARGET "${name}" POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "$<TARGET_FILE:HonkordGL>"
+                "$<TARGET_FILE_DIR:${name}>")
+    endif()
 endfunction()
 
 function(honkordgl_set_example_output_dir target_name subdir)
@@ -153,6 +178,11 @@ function(honkordgl_set_example_output_dir target_name subdir)
         set_target_properties("${target_name}" PROPERTIES
             BUILD_RPATH "$ORIGIN/${_rp}"
             INSTALL_RPATH "$ORIGIN/${_rp}")
+    endif()
+    if(APPLE AND BUILD_SHARED_LIBS)
+        set_target_properties("${target_name}" PROPERTIES
+            BUILD_RPATH "@loader_path"
+            INSTALL_RPATH "@loader_path")
     endif()
 endfunction()
 
@@ -206,7 +236,7 @@ if(HONKORDGL_BUILD_EXAMPLES)
         target_compile_options(ImGuiDemo PRIVATE -static-libgcc -static-libstdc++)
         target_link_options(ImGuiDemo PRIVATE -static-libgcc -static-libstdc++)
     endif()
-    if(WIN32 AND BUILD_SHARED_LIBS)
+    if((WIN32 OR APPLE) AND BUILD_SHARED_LIBS)
         add_custom_command(TARGET ImGuiDemo POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:HonkordGL>" "$<TARGET_FILE_DIR:ImGuiDemo>")
@@ -229,7 +259,7 @@ if(HONKORDGL_BUILD_EXAMPLES)
         target_compile_options(ImGuiSoftwareDemo PRIVATE -static-libgcc -static-libstdc++)
         target_link_options(ImGuiSoftwareDemo PRIVATE -static-libgcc -static-libstdc++)
     endif()
-    if(WIN32 AND BUILD_SHARED_LIBS)
+    if((WIN32 OR APPLE) AND BUILD_SHARED_LIBS)
         add_custom_command(TARGET ImGuiSoftwareDemo POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:HonkordGL>" "$<TARGET_FILE_DIR:ImGuiSoftwareDemo>")
@@ -250,10 +280,60 @@ if(HONKORDGL_BUILD_EXAMPLES)
         target_compile_options(NuklearDemo PRIVATE -static-libgcc -static-libstdc++)
         target_link_options(NuklearDemo PRIVATE -static-libgcc -static-libstdc++)
     endif()
-    if(WIN32 AND BUILD_SHARED_LIBS)
+    if((WIN32 OR APPLE) AND BUILD_SHARED_LIBS)
         add_custom_command(TARGET NuklearDemo POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "$<TARGET_FILE:HonkordGL>" "$<TARGET_FILE_DIR:NuklearDemo>")
+    endif()
+
+    if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
+        honkordgl_xcode_pair_sources(MovingSquare works MovingSquare Main.cpp MovingSquare)
+        honkordgl_xcode_pair_sources(Tetris works Tetris Main.cpp Tetris)
+        honkordgl_xcode_pair_sources(Checkerboard works Checkerboard Main.cpp Checkerboard)
+        honkordgl_xcode_pair_sources(AsteroidGame works AsteroidGame Main.cpp AsteroidGame)
+        honkordgl_xcode_pair_sources(GPURaytracing works GPURaytracing Main.cpp GPURaytracing)
+        honkordgl_xcode_pair_sources(SplitScreen works SplitScreen Main.cpp SplitScreen)
+        honkordgl_xcode_pair_sources(CameraPlayer works CameraPlayer Main.cpp CameraPlayer)
+
+        set(_pc_imgui_demo "${HONKORDGL_ROOT}/misc/pkgconfig/macos/ImGuiDemo.pc")
+        target_sources(ImGuiDemo PRIVATE "${_pc_imgui_demo}")
+        set_source_files_properties("${_pc_imgui_demo}" PROPERTIES HEADER_FILE_ONLY ON)
+        set(_imgui_demo_main "${HONKORDGL_ROOT}/works/ImGuiDemo/Main.cpp")
+        set(_imgui_demo_vendor
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkordgl.cpp")
+        source_group("works/ImGuiDemo" FILES "${_imgui_demo_main}")
+        source_group("works/ImGuiDemo/imgui" FILES ${_imgui_demo_vendor})
+        source_group("works/ImGuiDemo/pkgconfig" FILES "${_pc_imgui_demo}")
+
+        set(_pc_imgui_sw "${HONKORDGL_ROOT}/misc/pkgconfig/macos/ImGuiSoftwareDemo.pc")
+        target_sources(ImGuiSoftwareDemo PRIVATE "${_pc_imgui_sw}")
+        set_source_files_properties("${_pc_imgui_sw}" PROPERTIES HEADER_FILE_ONLY ON)
+        set(_imgui_sw_main "${HONKORDGL_ROOT}/works/ImGuiSoftwareDemo/Main.cpp")
+        set(_imgui_sw_vendor
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkord_software.cpp")
+        source_group("works/ImGuiSoftwareDemo" FILES "${_imgui_sw_main}")
+        source_group("works/ImGuiSoftwareDemo/imgui" FILES ${_imgui_sw_vendor})
+        source_group("works/ImGuiSoftwareDemo/pkgconfig" FILES "${_pc_imgui_sw}")
+
+        set(_pc_nk "${HONKORDGL_ROOT}/misc/pkgconfig/macos/NuklearDemo.pc")
+        target_sources(NuklearDemo PRIVATE "${_pc_nk}")
+        set_source_files_properties("${_pc_nk}" PROPERTIES HEADER_FILE_ONLY ON)
+        set(_nk_main "${HONKORDGL_ROOT}/works/NuklearDemo/Main.cpp")
+        set(_nk_vendor
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_honkord_core.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkord_input.cpp"
+            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkordgl.cpp")
+        source_group("works/NuklearDemo" FILES "${_nk_main}")
+        source_group("works/NuklearDemo/nuklear" FILES ${_nk_vendor})
+        source_group("works/NuklearDemo/pkgconfig" FILES "${_pc_nk}")
     endif()
 endif()
 
@@ -273,6 +353,13 @@ if(HONKORDGL_BUILD_TESTS)
     set(_ta "${HONKORDGL_ROOT}/tests/Audio/TestAudioSmoke.cpp")
     honkordgl_private_app(TestAudioSmoke _ta)
     honkordgl_set_test_output_dir(TestAudioSmoke tests/Audio)
+
+    if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
+        honkordgl_xcode_pair_sources(TestWindow tests Window TestWindow.cpp TestWindow)
+        honkordgl_xcode_pair_sources(TestSprite tests DrawSprite TestSprite.cpp TestSprite)
+        honkordgl_xcode_pair_sources(TestDeferredRenderer tests DeferredRenderer TestDeferredRenderer.cpp TestDeferredRenderer)
+        honkordgl_xcode_pair_sources(TestAudioSmoke tests Audio TestAudioSmoke.cpp TestAudioSmoke)
+    endif()
 endif()
 
 set(HONKORDGL_BUNDLE_COMPILE

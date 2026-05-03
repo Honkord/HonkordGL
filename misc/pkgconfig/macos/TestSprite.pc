@@ -1,0 +1,5 @@
+# TestSprite — macOS (tests/DrawSprite)
+Name: TestSprite
+Description: Sprite draw test (tests/DrawSprite)
+Version: 1.0.0
+Requires: HonkordGL

@@ -1,0 +1,5 @@
+# MovingSquare — macOS (works/MovingSquare)
+Name: MovingSquare
+Description: Moving square example (works/MovingSquare)
+Version: 1.0.0
+Requires: HonkordGL

@@ -1,0 +1,2 @@
+# works/ — Windows MSVC
+# Base: ../HonkordGL/windows-msvc.configuration.txt

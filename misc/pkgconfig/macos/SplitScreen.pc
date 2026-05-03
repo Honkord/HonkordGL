@@ -1,0 +1,5 @@
+# SplitScreen — macOS (works/SplitScreen)
+Name: SplitScreen
+Description: Split screen example (works/SplitScreen)
+Version: 1.0.0
+Requires: HonkordGL

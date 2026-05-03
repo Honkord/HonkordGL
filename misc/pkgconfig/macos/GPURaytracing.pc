@@ -1,0 +1,5 @@
+# GPURaytracing — macOS (works/GPURaytracing)
+Name: GPURaytracing
+Description: GPU ray tracing sample (works/GPURaytracing)
+Version: 1.0.0
+Requires: HonkordGL

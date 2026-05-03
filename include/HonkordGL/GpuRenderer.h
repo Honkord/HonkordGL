@@ -9,6 +9,7 @@
 #define HONKORDGL_GPURENDERER_H
 
 #include <HonkordGL/GpuTypes.h>
+#include <HonkordGL/GpuCapabilities.h>
 #include <HonkordGL/RendererContext.h>
 
 #include <cstddef>
@@ -26,6 +27,10 @@ HONKORDGL_API HONKORDGL_ND const char * RendererBackendLabel(Renderers backend) 
  * expose vendor graphics SDK types or entry points.
  *
  * Does not own the window context; `app` must outlive this object.
+ *
+ * Stable failures: integer results use `RendererContextResult` / `GpuShaderCompileError` / `GpuQueryResult` /
+ * `GpuFeatureEnableResult` as documented per function. When present, `HonkordGL::Graphics::GetInternalApiError`
+ * (`Video.h`) may carry an optional UTF-8 diagnostic for the same thread.
  */
 class HONKORDGL_API GpuRenderer {
 public:
@@ -208,6 +213,14 @@ public:
 
     /** @return Same as `RendererContextMakeCurrent` (0 = success). */
     HONKORDGL_ND int MakeCurrent() noexcept;
+
+    /** Fills `out_limits` for the bound context; @return `GpuQueryResult` as int. */
+    HONKORDGL_ND int QueryHardwareLimits(GpuLimits * out_limits) noexcept;
+
+    /** @return `GpuFeatureEnableResult` as int. */
+    HONKORDGL_ND int TryEnableOptionalFeature(GpuOptionalFeature feature) noexcept;
+
+    HONKORDGL_ND bool IsOptionalFeatureEnabled(GpuOptionalFeature feature) const noexcept;
 
     void SwapBuffers() noexcept;
 

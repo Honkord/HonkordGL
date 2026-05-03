@@ -225,6 +225,11 @@ GLXFBConfig ChooseMatchingFbConfig(
 
 int AttachRendererContext(ApplicationContextSettings& app, const RendererContextSettings& spec) noexcept
 {
+    {
+        const int vr = ValidateRendererDeviceRequest(spec);
+        if (vr != static_cast<int>(RendererContextResult::OK))
+            return vr;
+    }
     if (app.device != nullptr || app.active_renderer != 0)
         DetachRendererContext(app);
 

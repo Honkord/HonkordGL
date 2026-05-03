@@ -1,0 +1,6 @@
+// HonkordGL library — iOS device (HonkordGL CMake port may be incomplete; use for manual targets)
+#include "../platforms/Apple-common.xcconfig"
+SDKROOT = iphoneos
+IPHONEOS_DEPLOYMENT_TARGET = 14.0
+TARGETED_DEVICE_FAMILY = 1,2
+OTHER_LDFLAGS = $(inherited) -framework UIKit -framework Metal -framework QuartzCore -framework AudioToolbox -framework CoreGraphics

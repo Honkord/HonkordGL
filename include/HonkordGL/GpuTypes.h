@@ -17,14 +17,17 @@ namespace HonkordGL::Graphics {
 /** Opaque handle for shader programs, textures, buffers, etc., in the active HonkordGL graphics backend. */
 using GpuObjectName = unsigned int;
 
+/** Logical GPU adapter index for future multi-GPU selection; `0` always means default / primary in this build. */
+using GpuDeviceId = std::uint32_t;
+
 /**
- * Selects which adapter information string `GpuRenderer::GetAdapterString` copies
- * (numeric values match common graphics query constants).
+ * Selects which adapter information string `GpuRenderer::GetAdapterString` copies.
+ * Values are HonkordGL-owned (implementation maps to backend-specific queries internally).
  */
-enum class GpuAdapterStringId : unsigned int {
-    Vendor = 0x1F00,
-    Renderer = 0x1F01,
-    Version = 0x1F02,
+enum class GpuAdapterStringId : unsigned char {
+    Vendor = 1,
+    Renderer = 2,
+    Version = 3,
 };
 
 /** Generic GPU buffer binding slot. */

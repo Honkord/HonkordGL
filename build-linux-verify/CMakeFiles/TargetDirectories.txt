@@ -1,0 +1,4 @@
+/home/dasd/Projects/Libraries/HonkordGL/build-linux-verify/CMakeFiles/HonkordGL.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-linux-verify/CMakeFiles/bundles-capi.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-linux-verify/CMakeFiles/edit_cache.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-linux-verify/CMakeFiles/rebuild_cache.dir

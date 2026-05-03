@@ -1,0 +1,3 @@
+# HonkordGL — Windows MinGW 32-bit
+# Preset: cmake --preset windows-mingw32-ninja
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/mingw-i686

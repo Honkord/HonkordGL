@@ -1,0 +1,4 @@
+# HonkordGL — Linux (CMake; pkg-config)
+# Preset: cmake --preset linux-ninja-debug
+# pkg-config search path for committed .pc files:
+PKG_CONFIG_PATH=<REPO>/misc/pkgconfig/linux

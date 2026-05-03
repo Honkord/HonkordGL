@@ -22,7 +22,9 @@
 #include <HonkordGL/WindowBackend.h>
 #include <HonkordGL/Video.h>
 #include <HonkordGL/RendererContext.h>
+#include <HonkordGL/GpuApiBoundary.h>
 #include <HonkordGL/GpuTypes.h>
+#include <HonkordGL/GpuCapabilities.h>
 #include <HonkordGL/GpuRenderer.h>
 #include <HonkordGL/GpuShaderCompiler.h>
 #include <HonkordGL/SoftwareRenderer.h>

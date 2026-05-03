@@ -8,7 +8,10 @@
 #ifndef HONKORDGL_RENDERERCONTEXT_H
 #define HONKORDGL_RENDERERCONTEXT_H
 
+#include <HonkordGL/GpuTypes.h>
 #include <HonkordGL/WindowApplication.h>
+
+#include <cstdint>
 
 namespace HonkordGL::Graphics {
 
@@ -25,6 +28,10 @@ enum class RendererContextResult : int {
     MAKE_CURRENT_FAILED = -8,
     NO_RENDERER_ATTACHED = -9,
     ALREADY_ATTACHED = -10,
+    /** `RendererContextSettings::minimum_honkord_gl_api_level` exceeds this library build; see `HonkordGlLibraryApiLevel`. */
+    API_VERSION_INCOMPATIBLE = -11,
+    /** Non-default `RendererContextSettings::requested_gpu_device` is not implemented in this build. */
+    ADAPTER_SELECTION_UNSUPPORTED = -12,
 };
 
 /**
@@ -52,6 +59,14 @@ HONKORDGL_API struct RendererContextSettings {
     /** 1 = request adaptive vsync via GLX swap interval when the extension is present */
     int vsync;
 
+    /**
+     * Minimum library API level required for this attach (`HonkordGlMakeApiLevel` / `GpuApiBoundary.h`).
+     * `0` = no check. If set higher than `HonkordGlLibraryApiLevel()`, attach fails with `API_VERSION_INCOMPATIBLE`.
+     */
+    std::uint32_t minimum_honkord_gl_api_level;
+    /** Reserved for multi-adapter selection; must be `0` (default) in this build or attach fails with `ADAPTER_SELECTION_UNSUPPORTED`. */
+    GpuDeviceId requested_gpu_device;
+
     RendererContextSettings() noexcept
         : backend(Renderers::OPENGL),
           gl_major(3),
@@ -63,7 +78,9 @@ HONKORDGL_API struct RendererContextSettings {
           depth_bits_override(0),
           stencil_bits_override(0),
           msaa_samples_override(0),
-          vsync(1)
+          vsync(1),
+          minimum_honkord_gl_api_level(0),
+          requested_gpu_device(0)
     {
     }
 };
@@ -79,6 +96,12 @@ HONKORDGL_API struct RendererContextSettings {
 HONKORDGL_API int AttachRendererContext(
     ApplicationContextSettings& app,
     const RendererContextSettings& spec) noexcept;
+
+/**
+ * Validates device request fields (`minimum_honkord_gl_api_level`, `requested_gpu_device`) before attach.
+ * @return Same encoding as `RendererContextResult` (`OK` or a stable failure code).
+ */
+HONKORDGL_API HONKORDGL_ND int ValidateRendererDeviceRequest(const RendererContextSettings& spec) noexcept;
 
 /** Destroys the attached context and clears `app.device` (and related fields where applicable). */
 HONKORDGL_API void DetachRendererContext(ApplicationContextSettings& app) noexcept;
