@@ -29,10 +29,7 @@ at correctness and the pure CPU present path, not performance.
 # Setup
 
 ## Need Guidance?
-Well, that was a quick setup. Ready for programming? Beginners
-like you can redirect to docs/tutorial/ folder where we kept 
-all the tutorial documents covering up all aspects of the 
-HonkordGL. Have fun on your video game programming!
+Some tutorial document inside docs/tutorial/. 
 
 **NOTE**: We also have a simplified library 
 interface written in various languages. 
