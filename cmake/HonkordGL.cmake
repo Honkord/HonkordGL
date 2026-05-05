@@ -8,11 +8,17 @@ option(HONKORDGL_BUILD_TESTS "Build tests/" ON)
 option(HONKORDGL_USE_BUNDLED_WAYLAND_PROTOCOLS "Use checked-in Wayland protocol sources instead of wayland-scanner" OFF)
 
 set(HONKORDGL_CORE_LINUX
+    "${HONKORDGL_ROOT}/src/LinuxDisplayIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxEvdevIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/Direct3DIntegrationStub.cpp"
+    "${HONKORDGL_ROOT}/src/MetalIntegrationStub.cpp"
     "${HONKORDGL_ROOT}/src/Video.cpp"
     "${HONKORDGL_ROOT}/src/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderTarget.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderGraph.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
@@ -28,8 +34,19 @@ set(HONKORDGL_CORE_LINUX
     "${HONKORDGL_ROOT}/src/Audio/AudioFeatures.cpp"
     "${HONKORDGL_ROOT}/src/Audio/AudioAlsa.cpp"
     "${HONKORDGL_ROOT}/src/Joystick/Joystick.cpp"
-    "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp"
 )
+
+if(UNIX AND NOT APPLE AND NOT ANDROID)
+    find_package(Vulkan QUIET)
+endif()
+
+if(Vulkan_FOUND AND UNIX AND NOT APPLE AND NOT ANDROID)
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/src/VulkanRendererContext.cpp")
+elseif(UNIX AND NOT APPLE AND NOT ANDROID)
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp")
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/src/VulkanIntegrationStubs.cpp")
+    message(WARNING "HonkordGL: Vulkan SDK not found — using VulkanNoop and VulkanIntegration stubs (install libvulkan-dev for full Vulkan attach + integration API).")
+endif()
 
 set(HONKORDGL_PLATFORM_LINUX
     "${HONKORDGL_ROOT}/src/X11/WindowBackend.cpp"
@@ -49,11 +66,17 @@ set(HONKORDGL_PLATFORM_LINUX
 )
 
 set(HONKORDGL_CORE_WINDOWS
+    "${HONKORDGL_ROOT}/src/VulkanIntegrationStubs.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxDisplayIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxEvdevIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/MetalIntegrationStub.cpp"
     "${HONKORDGL_ROOT}/src/Video.cpp"
     "${HONKORDGL_ROOT}/src/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderTarget.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderGraph.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
@@ -104,6 +127,9 @@ elseif(UNIX AND NOT APPLE AND NOT ANDROID)
         wayland-client wayland-egl wayland-cursor
         asound dl pthread m)
     target_link_libraries(HonkordGL PUBLIC EGL GL)
+    if(Vulkan_FOUND)
+        target_link_libraries(HonkordGL PUBLIC Vulkan::Vulkan)
+    endif()
 else()
     message(FATAL_ERROR "HonkordGL CMake currently supports Windows, Linux desktop, and macOS (Apple) only.")
 endif()
@@ -125,6 +151,20 @@ set_target_properties(HonkordGL PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
+
+option(HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY "Run scripts/check_public_headers.py before building HonkordGL" ON)
+if(HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_custom_target(honkordgl_public_header_check
+            COMMAND ${Python3_EXECUTABLE} "${HONKORDGL_ROOT}/scripts/check_public_headers.py"
+            COMMENT "Checking HonkordGL public header boundary"
+            VERBATIM)
+        add_dependencies(HonkordGL honkordgl_public_header_check)
+    else()
+        message(WARNING "HonkordGL: Python 3 not found; install it or set HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY=OFF (public header boundary check skipped)")
+    endif()
+endif()
 
 if(MINGW)
     target_compile_options(HonkordGL PRIVATE

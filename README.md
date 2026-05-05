@@ -1,3 +1,5 @@
+### Project is still unfinished!!! 
+
 ### Honkord's Game Library (Indie Library) (ISO C++ V.: **C++ 17**)
 <img src="./Logo.png">
 

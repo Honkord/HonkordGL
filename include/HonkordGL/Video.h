@@ -11,7 +11,9 @@
 
 /**
  * @file Video.h
- * @brief High-level `Window` wrapper, `GpuRenderer`, `SoftwareRenderer` (CPU present path), `Software2DContext` / `SoftwareBlitCollector`, and diagnostics (`SetInternalApiError`, etc.).
+ * @brief Window lifecycle and framebuffer-oriented helpers (`Window`, diagnostics like `SetInternalApiError`).
+ *        GPU attach / draws live in `GpuRenderer.h`; CPU raster and `SoftwareRenderer` are optional — include
+ *        `SoftwareRenderer.h` or `Extras.h` when you need that path (see `docs/md_files/DevelopmentPlan.md`).
  */
 
 #include <HonkordGL/Cursor.h>

@@ -9,6 +9,7 @@
 
 #if defined(_WIN32)
 
+#include <HonkordGL/Direct3DIntegration.h>
 #include <HonkordGL/GpuShaderCompiler.h>
 #include <HonkordGL/Video.h>
 
@@ -327,6 +328,25 @@ void D3D11DestroyTexture(ApplicationContextSettings & app, GpuObjectName texture
 }
 
 } // namespace Internal
+
+int Direct3D11IntegrationGetNativeHandles(ApplicationContextSettings const * app, Direct3D11NativeHandles * out) noexcept
+{
+    if (!app || !out)
+        return static_cast<int>(Direct3DIntegrationResult::INVALID_ARGUMENT);
+    auto * const st = Internal::GetD3D11State(const_cast<ApplicationContextSettings &>(*app));
+    if (!st)
+        return static_cast<int>(Direct3DIntegrationResult::UNSUPPORTED_BACKEND);
+    std::memset(out, 0, sizeof(*out));
+    out->dxgi_factory = reinterpret_cast<HonkordGL_GW_Handle>(st->factory);
+    out->d3d11_device = reinterpret_cast<HonkordGL_GW_Handle>(st->device);
+    out->d3d11_immediate_context = reinterpret_cast<HonkordGL_GW_Handle>(st->immediate);
+    out->dxgi_swap_chain = reinterpret_cast<HonkordGL_GW_Handle>(st->swap);
+    out->d3d11_render_target_view = reinterpret_cast<HonkordGL_GW_Handle>(st->rtv);
+    out->backbuffer_width = st->bbWidth;
+    out->backbuffer_height = st->bbHeight;
+    return static_cast<int>(Direct3DIntegrationResult::OK);
+}
+
 } // namespace HonkordGL::Graphics
 
 #endif // defined(_WIN32)

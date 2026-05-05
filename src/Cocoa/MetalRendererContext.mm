@@ -7,6 +7,7 @@
  * Link: -framework Metal -framework QuartzCore -framework Cocoa
  */
 
+#include <HonkordGL/MetalIntegration.h>
 #include <HonkordGL/RendererContext.h>
 #include <HonkordGL/Video.h>
 #include <HonkordGL/WindowApplication.h>
@@ -16,6 +17,8 @@
 #import <Cocoa/Cocoa.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
+
+#include <cstring>
 
 namespace HonkordGL::Graphics::Internal {
 
@@ -184,6 +187,34 @@ void RendererContextSwapBuffersMetal(ApplicationContextSettings& app) noexcept
     app.frame_buffer_height = static_cast<int>(st.metalLayer.drawableSize.height);
 }
 
+int MetalIntegrationFillHandles(ApplicationContextSettings const * app, MetalNativeHandles * out) noexcept
+{
+    if (!app || !out)
+        return static_cast<int>(MetalIntegrationResult::INVALID_ARGUMENT);
+    if (app->active_renderer != static_cast<int>(Renderers::METAL) || !app->renderer_private)
+        return static_cast<int>(MetalIntegrationResult::UNSUPPORTED_BACKEND);
+
+    HonkordMetalRendererState * const st =
+        (__bridge HonkordMetalRendererState *)(void *)app->renderer_private;
+    if (!st)
+        return static_cast<int>(MetalIntegrationResult::UNSUPPORTED_BACKEND);
+
+    std::memset(out, 0, sizeof(*out));
+    out->mtl_device = reinterpret_cast<HonkordGL_GW_Handle>((__bridge void *)st.mtlDevice);
+    out->mtl_command_queue = reinterpret_cast<HonkordGL_GW_Handle>((__bridge void *)st.commandQueue);
+    out->ca_metal_layer = reinterpret_cast<HonkordGL_GW_Handle>((__bridge void *)st.metalLayer);
+    return static_cast<int>(MetalIntegrationResult::OK);
+}
+
 } // namespace HonkordGL::Graphics::Internal
+
+namespace HonkordGL::Graphics {
+
+int MetalIntegrationGetNativeHandles(ApplicationContextSettings const * app, MetalNativeHandles * out) noexcept
+{
+    return Internal::MetalIntegrationFillHandles(app, out);
+}
+
+} // namespace HonkordGL::Graphics
 
 #endif // __APPLE__

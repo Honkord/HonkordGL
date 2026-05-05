@@ -1,11 +1,17 @@
 # HonkordGL — macOS / Apple targets (included from HonkordGL.cmake when APPLE)
 
 set(HONKORDGL_CORE_APPLE
+    "${HONKORDGL_ROOT}/src/VulkanIntegrationStubs.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxDisplayIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxEvdevIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/Direct3DIntegrationStub.cpp"
     "${HONKORDGL_ROOT}/src/Video.cpp"
     "${HONKORDGL_ROOT}/src/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderTarget.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderGraph.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
@@ -22,7 +28,6 @@ set(HONKORDGL_CORE_APPLE
     "${HONKORDGL_ROOT}/src/Audio/CoreAudio.cpp"
     "${HONKORDGL_ROOT}/src/Joystick/Joystick.cpp"
     "${HONKORDGL_ROOT}/src/VulkanRendererContext.cpp"
-    "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp"
 )
 
 set(HONKORDGL_PLATFORM_APPLE

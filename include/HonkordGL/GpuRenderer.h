@@ -5,6 +5,22 @@
  * Copyright (C) 2026 Honkord
  */
 
+/**
+ * @file GpuRenderer.h
+ * @brief Raster helper on top of `RendererContext` / `AttachRendererContext`, with an explicit **mode**:
+ *
+ * | Tier | API surface | `GpuRendererMode` |
+ * |------|----------------|-------------------|
+ * | **Core** | `Bind`, `Create*` / `Destroy`, `MakeCurrent`, `SwapBuffers`, `GetGraphicsProc`, `QueryHardwareLimits`, attach helpers | Both modes |
+ * | **Assisted convenience** | Textures, buffers, VAOs, shader compile, draws — implicit context attach when mode is `Assisted` | Prefer `Assisted` |
+ * | **Minimal / engine** | Same helpers as assisted but **no implicit `MakeCurrent`** except where unavoidable (see `GetGraphicsProc`) — call `MakeCurrent()` yourself at frame boundaries | `Minimal` |
+ *
+ * Vulkan / Metal swapchain-only backends do not implement GL-style helpers; those entry points fail fast with
+ * `GpuShaderCompileError::UNSUPPORTED_BACKEND` unless documented otherwise (e.g. D3D11 texture path on Windows).
+ *
+ * Native contexts and proc tables: `GetGraphicsProc`, `QueryHardwareLimits`, `OpenGlIntegration`, backend integration headers.
+ */
+
 #ifndef HONKORDGL_GPURENDERER_H
 #define HONKORDGL_GPURENDERER_H
 
@@ -20,8 +36,9 @@ namespace HonkordGL::Graphics {
 HONKORDGL_API HONKORDGL_ND const char * RendererBackendLabel(Renderers backend) noexcept;
 
 /**
- * High-level renderer: attaches a graphics backend to an existing `ApplicationContextSettings`
- * (typically after `WindowBackend::CreateWindow`).
+ * Renderer helper: attaches a graphics backend to an existing `ApplicationContextSettings`
+ * (typically after `WindowBackend::CreateWindow`). Use `SetMode(GpuRendererMode::Minimal)` for engine-style
+ * control (caller owns `MakeCurrent`); default remains `Assisted` for tutorial-style code paths.
  *
  * Implementation uses the host platform’s native graphics APIs internally; this header does not
  * expose vendor graphics SDK types or entry points.
@@ -36,6 +53,7 @@ class HONKORDGL_API GpuRenderer {
 public:
     GpuRenderer() noexcept = default;
     explicit GpuRenderer(ApplicationContextSettings& app) noexcept;
+    GpuRenderer(ApplicationContextSettings& app, GpuRendererMode mode) noexcept;
 
     GpuRenderer(const GpuRenderer&) = delete;
     GpuRenderer& operator=(const GpuRenderer&) = delete;
@@ -51,6 +69,12 @@ public:
 
     /** Bound window/application context, or nullptr after `Unbind()`. */
     HONKORDGL_ND ApplicationContextSettings * App() const noexcept { return app_; }
+
+    /** Defaults to `GpuRendererMode::Assisted`. See `GpuRendererMode`. */
+    void SetMode(GpuRendererMode mode) noexcept { mode_ = mode; }
+
+    /** Current binding policy for implicit `MakeCurrent` inside GPU helpers. */
+    HONKORDGL_ND GpuRendererMode Mode() const noexcept { return mode_; }
 
     /**
      * Attaches a rendering API into the bound `ApplicationContextSettings`.
@@ -138,7 +162,11 @@ public:
      */
     HONKORDGL_ND int LoadShaderCompilerProcs() noexcept;
 
-    /** Resolves a graphics entry point by name for the current context (delegates to `RendererContextGetGraphicsProc`). */
+    /**
+     * Resolves a graphics entry point by name. `Assisted` matches `RendererContextGetGraphicsProc` (may call
+     * `MakeCurrent` first). `Minimal` resolves without switching context — thread must already hold the correct
+     * context from `MakeCurrent()` or the platform equivalent.
+     */
     HONKORDGL_ND void * GetGraphicsProc(const char * name) noexcept;
 
     /**
@@ -214,7 +242,10 @@ public:
     /** @return Same as `RendererContextMakeCurrent` (0 = success). */
     HONKORDGL_ND int MakeCurrent() noexcept;
 
-    /** Fills `out_limits` for the bound context; @return `GpuQueryResult` as int. */
+    /**
+     * Fills `out_limits` for the bound context; @return `GpuQueryResult` as int.
+     * Implementation may still call `RendererContextMakeCurrent` internally — independent of `GpuRendererMode`.
+     */
     HONKORDGL_ND int QueryHardwareLimits(GpuLimits * out_limits) noexcept;
 
     /** @return `GpuFeatureEnableResult` as int. */
@@ -224,7 +255,7 @@ public:
 
     void SwapBuffers() noexcept;
 
-    /** Clears the color buffer to `rgba` after `MakeCurrent`. No-op for backends without a color buffer here. */
+    /** Clears the color buffer to `rgba` (uses `EnsureCurrentPolicy`). No-op for backends without a color buffer here. */
     void ClearColorBuffer(float r, float g, float b, float a) noexcept;
 
     /**
@@ -240,7 +271,7 @@ public:
 
     /**
      * Compiles and links shader sources into a program object.
-     * Calls `MakeCurrent`, then `GpuShaderCompileProgram`.
+     * Honors `GpuRendererMode`: uses assisted implicit current-context attach unless mode is `Minimal`.
      */
     HONKORDGL_ND int CompileShaderProgram(
         const char * vertexSource,
@@ -294,6 +325,16 @@ public:
         std::size_t byteSize,
         GpuBufferUsage usage = GpuBufferUsage::Static) noexcept;
 
+    /**
+     * Same as `UploadBufferData` but accepts the raw OpenGL usage enum value (e.g. `0x88E4` for `GL_STATIC_DRAW`)
+     * so engines can pass driver-specific hints without extending `GpuBufferUsage`.
+     */
+    HONKORDGL_ND int UploadBufferDataRaw(
+        GpuBufferTarget target,
+        const void * data,
+        std::size_t byteSize,
+        std::uint32_t opengl_usage_enum) noexcept;
+
     /** Creates a vertex array object used to bind vertex/index stream layout. */
     HONKORDGL_ND int CreateVertexArray(GpuObjectName * outVertexArray) noexcept;
 
@@ -328,8 +369,11 @@ public:
         std::size_t indexOffsetBytes = 0) noexcept;
 
 private:
+    int EnsureCurrentPolicy() noexcept;
+
     ApplicationContextSettings * app_{nullptr};
     bool owns_attachment_{false};
+    GpuRendererMode mode_{GpuRendererMode::Assisted};
 };
 
 } // namespace HonkordGL::Graphics
