@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/TestWindow.dir/tests/Window/TestWindow.cpp.o -o /home/dasd/Projects/Libraries/HonkordGL/tests/Window/TestWindow  -Wl,-rpath,"\$ORIGIN/../../build-test:/home/dasd/Projects/Libraries/HonkordGL/build-test" libHonkordGL.so -lEGL -lGL 

@@ -1,0 +1,17 @@
+# Hashes of file build rules.
+5643d5470196445eed3c91aca64053d5 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/cursor-shape-v1-client-protocol.h
+ab46c03d603a5542b287aa7bbb9945fa /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/fractional-scale-v1-client-protocol.h
+4acb0305602a8843bcd72656626f2ea5 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/linux-drm-syncobj-v1-client-protocol.h
+7ac21153e80f5afd0d36c9f6d6e5c538 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/single-pixel-buffer-v1-client-protocol.h
+8a84800344e205ba02fd2efacaac4c6f /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/tablet-v2-client-protocol.h
+793b5f3a0fa13c3632960b96491df58c /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/text-input-v3-client-protocol.h
+229b07bdd3a772120e642090d014490b /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/viewporter-client-protocol.h
+7d19444e3e7154162ad5ba842c5acc39 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-activation-v1-client-protocol.h
+5fa1d62918cebf3c2ffab9f46eaacfd2 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-decoration-unstable-v1-client-protocol.h
+64a6f6e2058e54eddca7e8e69279efdd /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-dialog-v1-client-protocol.h
+eddae0b8d3d8f00d5232746602c25a84 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-foreign-unstable-v2-client-protocol.h
+a28a6747664627cdb631d8d071ff502c /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-shell-client-protocol.h
+3b37e134f5822b056526ff45f5a460a4 /home/dasd/Projects/Libraries/HonkordGL/src/Wayland/generated/xdg-toplevel-icon-v1-client-protocol.h
+ee3d6ec24d7119aa2b32afcfba27f334 CMakeFiles/HonkordGL_C_bundle_object
+f770b8bd87162c08fe48642370b67b95 CMakeFiles/bundles-capi
+a0664d22855d35f98a7776c2bf33ae38 CMakeFiles/honkordgl_public_header_check

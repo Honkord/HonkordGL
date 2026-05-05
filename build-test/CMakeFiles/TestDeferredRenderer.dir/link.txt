@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/TestDeferredRenderer.dir/tests/DeferredRenderer/TestDeferredRenderer.cpp.o -o /home/dasd/Projects/Libraries/HonkordGL/tests/DeferredRenderer/TestDeferredRenderer  -Wl,-rpath,"\$ORIGIN/../../build-test:/home/dasd/Projects/Libraries/HonkordGL/build-test" libHonkordGL.so -lEGL -lGL 

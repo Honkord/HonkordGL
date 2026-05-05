@@ -11,8 +11,8 @@
 #include <HonkordGL/PlatformAdapter.h>
 #include <HonkordGL/WindowApplication.h>
 
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 
 #if HONKORDGL_PLATFORM_APPLE
@@ -164,6 +164,38 @@ GLenum ToGlIndexType(GpuIndexType type) noexcept
 
 } // namespace
 
+namespace {
+
+void * ResolveGraphicsProc(ApplicationContextSettings * app, const char * name, bool makeCurrentFirst) noexcept
+{
+    if (!name || !app)
+        return nullptr;
+#if HONKORDGL_PLATFORM_WINDOWS
+    if (app->active_renderer == static_cast<int>(Renderers::DIRECT3D))
+        return nullptr;
+#endif
+    if (makeCurrentFirst)
+        (void)RendererContextMakeCurrent(*app);
+#if HONKORDGL_PLATFORM_APPLE
+    return dlsym(RTLD_DEFAULT, name);
+#elif HONKORDGL_GPU_RENDERER_OPENGL_ES
+    return reinterpret_cast<void *>(eglGetProcAddress(name));
+#elif HONKORDGL_PLATFORM_WINDOWS
+    void * p = reinterpret_cast<void *>(wglGetProcAddress(name));
+    if (p)
+        return p;
+    return reinterpret_cast<void *>(wglGetProcAddress(reinterpret_cast<LPCSTR>(name)));
+#elif HONKORDGL_PLATFORM_LINUX_DESKTOP
+    if (app->active_renderer == static_cast<int>(Renderers::EGL) && app->egl_display)
+        return reinterpret_cast<void *>(eglGetProcAddress(name));
+    return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
+#else
+    return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
+#endif
+}
+
+} // namespace
+
 const char * RendererBackendLabel(Renderers backend) noexcept
 {
     switch (backend) {
@@ -190,11 +222,19 @@ const char * RendererBackendLabel(Renderers backend) noexcept
 GpuRenderer::GpuRenderer(ApplicationContextSettings& app) noexcept
     : app_(&app)
     , owns_attachment_(false)
+    , mode_(GpuRendererMode::Assisted)
+{
+}
+GpuRenderer::GpuRenderer(ApplicationContextSettings& app, GpuRendererMode mode) noexcept
+    : app_(&app)
+    , owns_attachment_(false)
+    , mode_(mode)
 {
 }
 GpuRenderer::GpuRenderer(GpuRenderer&& other) noexcept
     : app_(other.app_)
     , owns_attachment_(other.owns_attachment_)
+    , mode_(other.mode_)
 {
     other.app_ = nullptr;
     other.owns_attachment_ = false;
@@ -205,6 +245,7 @@ GpuRenderer& GpuRenderer::operator=(GpuRenderer&& other) noexcept
         Destroy();
         app_ = other.app_;
         owns_attachment_ = other.owns_attachment_;
+        mode_ = other.mode_;
         other.app_ = nullptr;
         other.owns_attachment_ = false;
     }
@@ -424,6 +465,15 @@ int GpuRenderer::MakeCurrent() noexcept
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     return RendererContextMakeCurrent(*app_);
 }
+
+int GpuRenderer::EnsureCurrentPolicy() noexcept
+{
+    if (!app_)
+        return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
+    if (mode_ == GpuRendererMode::Minimal)
+        return static_cast<int>(RendererContextResult::OK);
+    return RendererContextMakeCurrent(*app_);
+}
 void GpuRenderer::SwapBuffers() noexcept
 {
     if (!app_)
@@ -490,7 +540,7 @@ void GpuRenderer::ClearColorBuffer(float r, float g, float b, float a) noexcept
         || app_->active_renderer == static_cast<int>(Renderers::METAL)
         || app_->active_renderer == static_cast<int>(Renderers::DIRECT3D))
         return;
-    (void)MakeCurrent();
+    (void)EnsureCurrentPolicy();
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -516,43 +566,22 @@ int GpuRenderer::LoadShaderCompilerProcs() noexcept
     if (app_->active_renderer == static_cast<int>(Renderers::DIRECT3D))
         return static_cast<int>(GpuShaderCompileError::OK);
 #endif
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderLoadCompilerProcs();
 }
 void * RendererContextGetGraphicsProc(ApplicationContextSettings * app, const char * name) noexcept
 {
-    if (!name || !app)
-        return nullptr;
-#if HONKORDGL_PLATFORM_WINDOWS
-    if (app->active_renderer == static_cast<int>(Renderers::DIRECT3D))
-        return nullptr;
-#endif
-    (void)RendererContextMakeCurrent(*app);
-#if HONKORDGL_PLATFORM_APPLE
-    return dlsym(RTLD_DEFAULT, name);
-#elif HONKORDGL_GPU_RENDERER_OPENGL_ES
-    return reinterpret_cast<void *>(eglGetProcAddress(name));
-#elif HONKORDGL_PLATFORM_WINDOWS
-    void * p = reinterpret_cast<void *>(wglGetProcAddress(name));
-    if (p)
-        return p;
-    return reinterpret_cast<void *>(wglGetProcAddress(reinterpret_cast<LPCSTR>(name)));
-#elif HONKORDGL_PLATFORM_LINUX_DESKTOP
-    if (app->active_renderer == static_cast<int>(Renderers::EGL) && app->egl_display)
-        return reinterpret_cast<void *>(eglGetProcAddress(name));
-    return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
-#else
-    return reinterpret_cast<void *>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name)));
-#endif
+    return ResolveGraphicsProc(app, name, true);
 }
 
 void * GpuRenderer::GetGraphicsProc(const char * name) noexcept
 {
     if (!app_)
         return nullptr;
-    return RendererContextGetGraphicsProc(app_, name);
+    const bool makeFirst = (mode_ == GpuRendererMode::Assisted);
+    return ResolveGraphicsProc(app_, name, makeFirst);
 }
 int GpuRenderer::GetAdapterString(GpuAdapterStringId which, char * buf, std::size_t bufBytes) noexcept
 {
@@ -561,7 +590,7 @@ int GpuRenderer::GetAdapterString(GpuAdapterStringId which, char * buf, std::siz
     buf[0] = '\0';
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::UNSUPPORTED_BACKEND);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     const GLenum name = GpuAdapterStringIdToGLenum(which);
@@ -603,7 +632,7 @@ int GpuRenderer::CreateTexture2DRgba8(
     if (app_->active_renderer == static_cast<int>(Renderers::DIRECT3D))
         return Internal::D3D11CreateTexture2DRgba8(*app_, width, height, pixels, outTexture);
 #endif
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
 
@@ -706,7 +735,7 @@ int GpuRenderer::UpdateTexture2DRgba8(
     if (app_->active_renderer == static_cast<int>(Renderers::DIRECT3D))
         return Internal::D3D11UpdateTexture2DRgba8(*app_, texture, width, height, pixels);
 #endif
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
 
@@ -757,7 +786,7 @@ void GpuRenderer::BindTexture2D(unsigned int textureUnit, GpuObjectName textureN
         return;
     }
 #endif
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
     const GLenum tu = static_cast<GLenum>(GL_TEXTURE0 + textureUnit);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -785,7 +814,7 @@ void GpuRenderer::DestroyTexture(GpuObjectName textureName) noexcept
         return;
     }
 #endif
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
     GLuint t = static_cast<GLuint>(textureName);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -802,7 +831,7 @@ void GpuRenderer::BindShaderProgram(GpuObjectName program) noexcept
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     glUseProgram(static_cast<GLuint>(program));
@@ -848,7 +877,7 @@ int GpuRenderer::CompileShaderProgram(
 {
     if (!app_)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderCompileProgram(
@@ -866,7 +895,7 @@ void GpuRenderer::DeleteShaderProgram(GpuObjectName program) noexcept
 {
     if (!program || !app_)
         return;
-    (void)MakeCurrent();
+    (void)EnsureCurrentPolicy();
     GpuShaderDeleteProgram(static_cast<unsigned int>(program));
 }
 
@@ -875,7 +904,7 @@ int GpuRenderer::CreateShaderObject(GpuShaderPipelineStage stage, GpuObjectName 
     if (!outShader || !app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
     *outShader = 0;
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderCreateObject(app_, stage, reinterpret_cast<unsigned int *>(outShader));
@@ -885,7 +914,7 @@ int GpuRenderer::SetShaderSource(GpuObjectName shader, const char * source) noex
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderSetShaderSource(app_, static_cast<unsigned int>(shader), source);
@@ -895,7 +924,7 @@ int GpuRenderer::CompileShaderObject(GpuObjectName shader, char * infoLog, std::
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderCompileShaderObject(app_, static_cast<unsigned int>(shader), infoLog, infoLogBytes);
@@ -906,7 +935,7 @@ int GpuRenderer::CreateProgramObject(GpuObjectName * outProgram) noexcept
     if (!outProgram || !app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
     *outProgram = 0;
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderCreateProgramObject(app_, reinterpret_cast<unsigned int *>(outProgram));
@@ -916,7 +945,7 @@ void GpuRenderer::AttachShader(GpuObjectName program, GpuObjectName shader) noex
 {
     if (!program || !shader || !app_ || !GlslGpuPathOk(app_))
         return;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
     GpuShaderAttachShader(app_, static_cast<unsigned int>(program), static_cast<unsigned int>(shader));
 }
@@ -925,7 +954,7 @@ int GpuRenderer::BindAttribLocation(GpuObjectName program, unsigned int location
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderBindAttribLocation(app_, static_cast<unsigned int>(program), location, name);
@@ -935,7 +964,7 @@ int GpuRenderer::LinkShaderObjects(GpuObjectName program, char * infoLog, std::s
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    const int mc = MakeCurrent();
+    const int mc = EnsureCurrentPolicy();
     if (mc != static_cast<int>(RendererContextResult::OK))
         return mc;
     return GpuShaderLinkProgramObject(app_, static_cast<unsigned int>(program), infoLog, infoLogBytes);
@@ -945,7 +974,7 @@ void GpuRenderer::DeleteShaderObject(GpuObjectName shader) noexcept
 {
     if (!shader || !app_ || !GlslGpuPathOk(app_))
         return;
-    (void)MakeCurrent();
+    (void)EnsureCurrentPolicy();
     GpuShaderDeleteShaderObject(static_cast<unsigned int>(shader));
 }
 
@@ -954,7 +983,7 @@ int GpuRenderer::CreateBuffer(GpuObjectName * outBuffer) noexcept
     if (!outBuffer || !app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
     *outBuffer = 0;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
 
     GLuint id = 0;
@@ -981,7 +1010,7 @@ void GpuRenderer::DestroyBuffer(GpuObjectName buffer) noexcept
 {
     if (!buffer || !app_ || !GlslGpuPathOk(app_))
         return;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
     const GLuint id = static_cast<GLuint>(buffer);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -1006,7 +1035,7 @@ int GpuRenderer::BindBuffer(GpuBufferTarget target, GpuObjectName buffer) noexce
     const GLenum glTarget = ToGlBufferTarget(target);
     if (!glTarget)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
 
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -1027,20 +1056,20 @@ int GpuRenderer::BindBuffer(GpuBufferTarget target, GpuObjectName buffer) noexce
 #endif
     return 0;
 }
-int GpuRenderer::UploadBufferData(
+int GpuRenderer::UploadBufferDataRaw(
     GpuBufferTarget target,
     const void * data,
     std::size_t byteSize,
-    GpuBufferUsage usage) noexcept
+    std::uint32_t opengl_usage_enum) noexcept
 {
     if (!app_ || !GlslGpuPathOk(app_) || (!data && byteSize > 0))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
     const GLenum glTarget = ToGlBufferTarget(target);
     if (!glTarget)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
-    const GLenum glUsage = ToGlBufferUsage(usage);
+    const GLenum glUsage = static_cast<GLenum>(opengl_usage_enum);
     const GLsizeiptr sz = static_cast<GLsizeiptr>(byteSize);
 
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -1061,12 +1090,21 @@ int GpuRenderer::UploadBufferData(
 #endif
     return 0;
 }
+
+int GpuRenderer::UploadBufferData(
+    GpuBufferTarget target,
+    const void * data,
+    std::size_t byteSize,
+    GpuBufferUsage usage) noexcept
+{
+    return UploadBufferDataRaw(target, data, byteSize, static_cast<std::uint32_t>(ToGlBufferUsage(usage)));
+}
 int GpuRenderer::CreateVertexArray(GpuObjectName * outVertexArray) noexcept
 {
     if (!outVertexArray || !app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
     *outVertexArray = 0;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     GLuint id = 0;
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -1092,7 +1130,7 @@ void GpuRenderer::DestroyVertexArray(GpuObjectName vertexArray) noexcept
 {
     if (!vertexArray || !app_ || !GlslGpuPathOk(app_))
         return;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
     const GLuint id = static_cast<GLuint>(vertexArray);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
@@ -1114,7 +1152,7 @@ int GpuRenderer::BindVertexArray(GpuObjectName vertexArray) noexcept
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::UNSUPPORTED_BACKEND);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     glBindVertexArray(static_cast<GLuint>(vertexArray));
@@ -1138,7 +1176,7 @@ int GpuRenderer::EnableVertexAttribute(unsigned int location) noexcept
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return static_cast<int>(GpuShaderCompileError::UNSUPPORTED_BACKEND);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     glEnableVertexAttribArray(static_cast<GLuint>(location));
@@ -1167,7 +1205,7 @@ int GpuRenderer::SetVertexAttributeFloat(
 {
     if (!app_ || !GlslGpuPathOk(app_) || components <= 0 || components > 4 || strideBytes < 0)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     const GLboolean glNorm = normalized ? GL_TRUE : GL_FALSE;
     const void * ptr = reinterpret_cast<const void *>(static_cast<std::uintptr_t>(offsetBytes));
@@ -1193,7 +1231,7 @@ void GpuRenderer::SetDepthTestEnabled(bool enabled) noexcept
 {
     if (!app_ || !GlslGpuPathOk(app_))
         return;
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return;
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     if (enabled)
@@ -1224,7 +1262,7 @@ int GpuRenderer::DrawArrays(GpuPrimitive primitive, int firstVertex, int vertexC
     const GLenum glPrim = ToGlPrimitive(primitive);
     if (!glPrim)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE
     glDrawArrays(glPrim, firstVertex, vertexCount);
@@ -1250,7 +1288,7 @@ int GpuRenderer::DrawIndexed(
     const GLenum glIndexType = ToGlIndexType(indexType);
     if (!glPrim || !glIndexType)
         return static_cast<int>(GpuShaderCompileError::INVALID_ARGUMENT);
-    if (MakeCurrent() != static_cast<int>(RendererContextResult::OK))
+    if (EnsureCurrentPolicy() != static_cast<int>(RendererContextResult::OK))
         return static_cast<int>(RendererContextResult::INVALID_ARGUMENT);
     const void * ptr = reinterpret_cast<const void *>(static_cast<std::uintptr_t>(indexOffsetBytes));
 #if HONKORDGL_GPU_RENDERER_OPENGL_ES || HONKORDGL_PLATFORM_APPLE

@@ -1,0 +1,17 @@
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/HonkordGL.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/honkordgl_public_header_check.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestWindow.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestSprite.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestDeferredRenderer.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestAudioSmoke.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestBackendCapabilities.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/TestUmbrellaInclude.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/bundles-capi.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/HonkordGL_C.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/HonkordGL_C_bundle_object.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/edit_cache.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/rebuild_cache.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/list_install_components.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/install.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/install/local.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-test/CMakeFiles/install/strip.dir

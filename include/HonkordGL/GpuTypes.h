@@ -64,6 +64,30 @@ enum class GpuShaderPipelineStage : unsigned char {
     Geometry,
 };
 
+/**
+ * `GpuRenderer` context-binding policy.
+ * - **Assisted** (default): most GPU helpers call `MakeCurrent` internally before issuing GL/D3D work.
+ * - **Minimal**: caller keeps the rendering context current across calls — fewer `MakeCurrent` transitions,
+ *   but incorrect ordering yields undefined driver behavior. Prefer with frame loops that already call
+ *   `GpuRenderer::MakeCurrent()` once per frame (or per thread).
+ */
+enum class GpuRendererMode : unsigned char {
+    Assisted = 0,
+    Minimal = 1,
+};
+
+/** Depth comparison for `GpuRenderPassBeginInfo` / `GpuGlStateTracker` (OpenGL family). */
+enum class GpuDepthFunc : unsigned char {
+    Never = 1,
+    Less = 2,
+    Equal = 3,
+    LessOrEqual = 4,
+    Greater = 5,
+    NotEqual = 6,
+    GreaterOrEqual = 7,
+    DepthAlways = 8,
+};
+
 } // namespace HonkordGL::Graphics
 
 #endif

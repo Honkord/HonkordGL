@@ -1,0 +1,14 @@
+@PACKAGE_INIT@
+
+set(HONKORDGL_INSTALL_SHARED_LIBS "@HONKORDGL_INSTALL_SHARED_LIBS@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/HonkordGLTargets.cmake")
+
+check_required_components(HonkordGL)
+
+if(HONKORDGL_INSTALL_SHARED_LIBS)
+    if(TARGET HonkordGL::HonkordGL)
+        set_property(TARGET HonkordGL::HonkordGL APPEND PROPERTY
+            INTERFACE_COMPILE_DEFINITIONS HONKORDGL_USING_DLL)
+    endif()
+endif()

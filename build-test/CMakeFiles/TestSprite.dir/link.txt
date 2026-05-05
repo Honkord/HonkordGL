@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/TestSprite.dir/tests/DrawSprite/TestSprite.cpp.o -o /home/dasd/Projects/Libraries/HonkordGL/tests/DrawSprite/TestSprite  -Wl,-rpath,"\$ORIGIN/../../build-test:/home/dasd/Projects/Libraries/HonkordGL/build-test" libHonkordGL.so -lEGL -lGL 

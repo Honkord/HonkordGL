@@ -9,6 +9,7 @@
 
 #include <HonkordGL/RendererContext.h>
 #include <HonkordGL/Video.h>
+#include <HonkordGL/VulkanIntegration.h>
 #include <HonkordGL/WindowApplication.h>
 
 #if HONKORDGL_PLATFORM_LINUX_DESKTOP
@@ -669,7 +670,156 @@ void RendererContextSwapBuffersVulkan(ApplicationContextSettings& app) noexcept
         (void)CreateSwapchainFull(app, *st);
 }
 
+int VulkanIntegrationFillHandles(ApplicationContextSettings const * app, VulkanIntegrationNativeHandles * out) noexcept
+{
+    if (!app || !out)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    auto * const st = reinterpret_cast<VulkanRendererState *>(app->renderer_private);
+    if (!st || app->active_renderer != static_cast<int>(Renderers::VULKAN))
+        return static_cast<int>(VulkanIntegrationResult::UNSUPPORTED_BACKEND);
+
+    std::memset(out, 0, sizeof(*out));
+    out->instance = reinterpret_cast<HonkordGL_GW_Handle>(st->instance);
+    out->physical_device = reinterpret_cast<HonkordGL_GW_Handle>(st->physicalDevice);
+    out->device = reinterpret_cast<HonkordGL_GW_Handle>(st->device);
+    out->surface = reinterpret_cast<HonkordGL_GW_Handle>(st->surface);
+    out->swapchain = reinterpret_cast<HonkordGL_GW_Handle>(st->swapchain);
+    out->graphics_queue = reinterpret_cast<HonkordGL_GW_Handle>(st->graphicsQueue);
+    out->render_pass = reinterpret_cast<HonkordGL_GW_Handle>(st->renderPass);
+    out->command_pool = reinterpret_cast<HonkordGL_GW_Handle>(st->commandPool);
+    out->command_buffer = reinterpret_cast<HonkordGL_GW_Handle>(st->commandBuffer);
+    out->image_available_semaphore = reinterpret_cast<HonkordGL_GW_Handle>(st->imageAvailableSemaphore);
+    out->render_finished_semaphore = reinterpret_cast<HonkordGL_GW_Handle>(st->renderFinishedSemaphore);
+    out->flight_fence = reinterpret_cast<HonkordGL_GW_Handle>(st->inFlightFence);
+    out->graphics_queue_family_index = st->graphicsFamily;
+    out->present_queue_family_index = st->presentFamily;
+    out->swapchain_width = st->swapchainExtent.width;
+    out->swapchain_height = st->swapchainExtent.height;
+
+    std::uint32_t const n = static_cast<std::uint32_t>(st->swapchainImages.size());
+    out->swapchain_image_count = n;
+    std::uint32_t const cap = static_cast<std::uint32_t>(sizeof(out->swapchain_images) / sizeof(out->swapchain_images[0]));
+    std::uint32_t const m = n < cap ? n : cap;
+    for (std::uint32_t i = 0; i < m; ++i) {
+        out->swapchain_images[i] = reinterpret_cast<HonkordGL_GW_Handle>(st->swapchainImages[i]);
+        out->swapchain_image_views[i] = reinterpret_cast<HonkordGL_GW_Handle>(st->swapchainImageViews[i]);
+        out->swapchain_framebuffers[i] = reinterpret_cast<HonkordGL_GW_Handle>(st->swapchainFramebuffers[i]);
+    }
+    return static_cast<int>(VulkanIntegrationResult::OK);
+}
+
 } // namespace HonkordGL::Graphics::Internal
+
+namespace HonkordGL::Graphics {
+
+int VulkanIntegrationGetNativeHandles(ApplicationContextSettings const * app, VulkanIntegrationNativeHandles * out) noexcept
+{
+    return Internal::VulkanIntegrationFillHandles(app, out);
+}
+
+void * VulkanIntegrationGetInstanceProcAddr(HonkordGL_GW_Handle instance, char const * name) noexcept
+{
+    if (!name)
+        return nullptr;
+    return reinterpret_cast<void *>(vkGetInstanceProcAddr(reinterpret_cast<VkInstance>(instance), name));
+}
+
+void * VulkanIntegrationGetDeviceProcAddr(HonkordGL_GW_Handle device, char const * name) noexcept
+{
+    if (!name)
+        return nullptr;
+    return reinterpret_cast<void *>(vkGetDeviceProcAddr(reinterpret_cast<VkDevice>(device), name));
+}
+
+void * VulkanIntegrationGetVulkanGetInstanceProcAddr() noexcept
+{
+    return reinterpret_cast<void *>(&vkGetInstanceProcAddr);
+}
+
+int VulkanIntegrationEnumerateInstanceExtensions(
+    char const * layer_name_or_null,
+    VulkanIntegrationExtensionCallback callback,
+    void * user,
+    int * out_count) noexcept
+{
+    uint32_t count = 0;
+    VkResult const q = vkEnumerateInstanceExtensionProperties(layer_name_or_null, &count, nullptr);
+    if (q != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    if (!callback) {
+        if (out_count)
+            *out_count = static_cast<int>(count);
+        return static_cast<int>(count);
+    }
+    std::vector<VkExtensionProperties> props(count);
+    if (count > 0 && vkEnumerateInstanceExtensionProperties(layer_name_or_null, &count, props.data()) != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    int written = 0;
+    for (uint32_t i = 0; i < count; ++i) {
+        callback(user, props[i].extensionName, props[i].specVersion);
+        ++written;
+    }
+    if (out_count)
+        *out_count = written;
+    return written;
+}
+
+int VulkanIntegrationEnumerateInstanceLayers(
+    VulkanIntegrationExtensionCallback callback,
+    void * user,
+    int * out_count) noexcept
+{
+    uint32_t count = 0;
+    if (vkEnumerateInstanceLayerProperties(&count, nullptr) != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    if (!callback) {
+        if (out_count)
+            *out_count = static_cast<int>(count);
+        return static_cast<int>(count);
+    }
+    std::vector<VkLayerProperties> layers(count);
+    if (count > 0 && vkEnumerateInstanceLayerProperties(&count, layers.data()) != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    int written = 0;
+    for (uint32_t i = 0; i < count; ++i) {
+        callback(user, layers[i].layerName, layers[i].specVersion);
+        ++written;
+    }
+    if (out_count)
+        *out_count = written;
+    return written;
+}
+
+int VulkanIntegrationEnumerateDeviceExtensions(
+    HonkordGL_GW_Handle physical_device,
+    VulkanIntegrationExtensionCallback callback,
+    void * user,
+    int * out_count) noexcept
+{
+    VkPhysicalDevice const pd = reinterpret_cast<VkPhysicalDevice>(physical_device);
+    uint32_t count = 0;
+    VkResult const q = vkEnumerateDeviceExtensionProperties(pd, nullptr, &count, nullptr);
+    if (q != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    if (!callback) {
+        if (out_count)
+            *out_count = static_cast<int>(count);
+        return static_cast<int>(count);
+    }
+    std::vector<VkExtensionProperties> props(count);
+    if (count > 0 && vkEnumerateDeviceExtensionProperties(pd, nullptr, &count, props.data()) != VK_SUCCESS)
+        return static_cast<int>(VulkanIntegrationResult::INVALID_ARGUMENT);
+    int written = 0;
+    for (uint32_t i = 0; i < count; ++i) {
+        callback(user, props[i].extensionName, props[i].specVersion);
+        ++written;
+    }
+    if (out_count)
+        *out_count = written;
+    return written;
+}
+
+} // namespace HonkordGL::Graphics
 
 #else /* !linux desktop */
 

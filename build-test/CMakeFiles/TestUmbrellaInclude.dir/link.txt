@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/TestUmbrellaInclude.dir/tests/Portability/TestUmbrellaInclude.cpp.o -o /home/dasd/Projects/Libraries/HonkordGL/tests/Portability/TestUmbrellaInclude  -Wl,-rpath,"\$ORIGIN/../../build-test:/home/dasd/Projects/Libraries/HonkordGL/build-test" libHonkordGL.so -lEGL -lGL 

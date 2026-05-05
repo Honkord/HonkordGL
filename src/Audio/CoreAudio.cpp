@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <vector>
 
-#if HONKORDGL_PLATFORM_APPLE
+#if !HONKORDGL_AUDIO_DISABLED && HONKORDGL_PLATFORM_APPLE
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <TargetConditionals.h>

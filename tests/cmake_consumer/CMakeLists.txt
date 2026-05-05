@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.20)
+project(HonkordGL_Consumer LANGUAGES CXX)
+find_package(HonkordGL CONFIG REQUIRED)
+add_executable(consume main.cpp)
+target_link_libraries(consume PRIVATE HonkordGL::HonkordGL)
+set_target_properties(consume PROPERTIES CXX_STANDARD 17)

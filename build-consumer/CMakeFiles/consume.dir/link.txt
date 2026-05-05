@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/consume.dir/main.cpp.o -o consume  -Wl,-rpath,/tmp/honktest/lib /tmp/honktest/lib/libHonkordGL.so -lEGL -lGL 

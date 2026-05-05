@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  linux-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-default
+            cc: gcc
+            cxx: g++
+            cmake_extra: ""
+          - name: clang-default
+            cc: clang
+            cxx: clang++
+            cmake_extra: ""
+          - name: gcc-x11-only
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DHONKORDGL_ENABLE_WAYLAND=OFF"
+          - name: gcc-wayland-only
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DHONKORDGL_ENABLE_X11=OFF"
+          - name: gcc-no-vulkan
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DHONKORDGL_ENABLE_VULKAN=OFF"
+          - name: gcc-no-audio
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DHONKORDGL_ENABLE_AUDIO=OFF"
+          - name: gcc-static
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DBUILD_SHARED_LIBS=OFF"
+          - name: gcc-software-only
+            cc: gcc
+            cxx: g++
+            cmake_extra: "-DHONKORDGL_ENABLE_SOFTWARE_ONLY=ON"
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ninja-build \
+            libx11-dev libxrandr-dev libxi-dev libxcursor-dev \
+            libwayland-dev wayland-protocols \
+            libegl1-mesa-dev libgl1-mesa-dev \
+            libasound2-dev libvulkan-dev pkg-config python3
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DHONKORDGL_BUILD_EXAMPLES=OFF ${{ matrix.cmake_extra }}
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Public header boundary check
+        run: python3 scripts/check_public_headers.py
+      - name: Install + CMake consumer smoke test
+        run: |
+          cmake --install build --prefix "$(pwd)/inst"
+          cmake -S tests/cmake_consumer -B build-consumer -DCMAKE_PREFIX_PATH="$(pwd)/inst" -G Ninja
+          cmake --build build-consumer -j$(nproc)
+
+  windows-msvc:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Configure
+        run: cmake -S . -B build -DHONKORDGL_BUILD_EXAMPLES=OFF
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Public header boundary check
+        run: python scripts/check_public_headers.py
+      - name: Install + CMake consumer smoke test
+        shell: bash
+        run: |
+          cmake --install build --config Release --prefix "$GITHUB_WORKSPACE/inst"
+          cmake -S tests/cmake_consumer -B build-consumer -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/inst"
+          cmake --build build-consumer --config Release --parallel
+
+  macos-clang:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Configure
+        run: cmake -S . -B build -DHONKORDGL_BUILD_EXAMPLES=OFF
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Public header boundary check
+        run: python3 scripts/check_public_headers.py
+      - name: Install + CMake consumer smoke test
+        run: |
+          cmake --install build --prefix "$GITHUB_WORKSPACE/inst"
+          cmake -S tests/cmake_consumer -B build-consumer -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/inst"
+          cmake --build build-consumer --parallel

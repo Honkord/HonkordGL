@@ -2,17 +2,57 @@ if(NOT DEFINED HONKORDGL_ROOT)
     message(FATAL_ERROR "HonkordGL.cmake requires HONKORDGL_ROOT")
 endif()
 
+macro(honkordgl_configure_build_features_header)
+    configure_file(
+        "${CMAKE_CURRENT_LIST_DIR}/BuildFeatures.h.in"
+        "${CMAKE_BINARY_DIR}/generated/HonkordGL/BuildFeatures.h"
+        @ONLY)
+endmacro()
+
 option(BUILD_SHARED_LIBS "Build HonkordGL as a shared library (otherwise static)" ON)
+option(HONKORDGL_INSTALL "Generate install rules and CMake package config" ON)
 option(HONKORDGL_BUILD_EXAMPLES "Build works/ examples" ON)
 option(HONKORDGL_BUILD_TESTS "Build tests/" ON)
 option(HONKORDGL_USE_BUNDLED_WAYLAND_PROTOCOLS "Use checked-in Wayland protocol sources instead of wayland-scanner" OFF)
 
+option(HONKORDGL_ENABLE_X11 "Enable X11 window backend (Linux desktop)" ON)
+option(HONKORDGL_ENABLE_WAYLAND "Enable Wayland window backend (Linux desktop)" ON)
+option(HONKORDGL_ENABLE_DRM "Compile DRM/KMS event sources (Linux)" OFF)
+option(HONKORDGL_ENABLE_OPENGL "Enable OpenGL renderer sources and links" ON)
+option(HONKORDGL_ENABLE_D3D11 "Enable Direct3D 11 renderer (Windows)" ON)
+option(HONKORDGL_ENABLE_METAL "Enable Metal renderer sources (Apple)" ON)
+
+set(HONKORDGL_ENABLE_VULKAN "AUTO" CACHE STRING "Vulkan renderer: AUTO (detect), ON, or OFF")
+set_property(CACHE HONKORDGL_ENABLE_VULKAN PROPERTY STRINGS AUTO ON OFF)
+
+option(HONKORDGL_ENABLE_AUDIO "Enable audio subsystem" ON)
+option(HONKORDGL_ENABLE_ALSA "Linux: use ALSA when PipeWire is off" ON)
+option(HONKORDGL_ENABLE_PIPEWIRE "Linux: use PipeWire (requires libpipewire); mutually exclusive with ALSA path" OFF)
+option(HONKORDGL_ENABLE_SOFTWARE_ONLY "CPU-first profile: disables Vulkan, D3D11, and Metal at configure time (OpenGL stack may remain for desktop windowing)" OFF)
+
+if(HONKORDGL_ENABLE_SOFTWARE_ONLY)
+    set(HONKORDGL_ENABLE_VULKAN OFF CACHE STRING "" FORCE)
+    set(HONKORDGL_ENABLE_D3D11 OFF CACHE BOOL "" FORCE)
+    set(HONKORDGL_ENABLE_METAL OFF CACHE BOOL "" FORCE)
+    message(STATUS "HonkordGL: HONKORDGL_ENABLE_SOFTWARE_ONLY=ON — Vulkan, D3D11, and Metal disabled (OpenGL/EGL may still link for GLX/WGL and GpuRenderer).")
+endif()
+if(NOT HONKORDGL_ENABLE_OPENGL)
+    message(FATAL_ERROR "HonkordGL: HONKORDGL_ENABLE_OPENGL=OFF is not supported in this release. GpuRenderer, GpuShaderCompiler, and desktop renderer contexts still compile against OpenGL headers. Use HONKORDGL_ENABLE_SOFTWARE_ONLY=ON to disable Vulkan/D3D11/Metal, or open an issue for a headless / GLES-only split.")
+endif()
 set(HONKORDGL_CORE_LINUX
+    "${HONKORDGL_ROOT}/src/BackendCapabilities.cpp"
+    "${HONKORDGL_ROOT}/src/VulkanWindowHelper.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxDisplayIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxEvdevIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/Direct3DIntegrationStub.cpp"
+    "${HONKORDGL_ROOT}/src/MetalIntegrationStub.cpp"
     "${HONKORDGL_ROOT}/src/Video.cpp"
     "${HONKORDGL_ROOT}/src/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderTarget.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderGraph.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
@@ -28,10 +68,9 @@ set(HONKORDGL_CORE_LINUX
     "${HONKORDGL_ROOT}/src/Audio/AudioFeatures.cpp"
     "${HONKORDGL_ROOT}/src/Audio/AudioAlsa.cpp"
     "${HONKORDGL_ROOT}/src/Joystick/Joystick.cpp"
-    "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp"
 )
 
-set(HONKORDGL_PLATFORM_LINUX
+set(HONKORDGL_LINUX_X11_SOURCES
     "${HONKORDGL_ROOT}/src/X11/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/X11/EventsX11.cpp"
     "${HONKORDGL_ROOT}/src/X11/CursorX11.cpp"
@@ -40,20 +79,83 @@ set(HONKORDGL_PLATFORM_LINUX
     "${HONKORDGL_ROOT}/src/X11/MonitorsX11.cpp"
     "${HONKORDGL_ROOT}/src/X11/GLXRendererContext.cpp"
     "${HONKORDGL_ROOT}/src/X11/EGLRendererContextX11.cpp"
+)
+
+set(HONKORDGL_LINUX_WAYLAND_SOURCES
     "${HONKORDGL_ROOT}/src/Wayland/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/Wayland/EventsWayland.cpp"
     "${HONKORDGL_ROOT}/src/Wayland/PlatformSession.cpp"
     "${HONKORDGL_ROOT}/src/Wayland/IpcWayland.cpp"
     "${HONKORDGL_ROOT}/src/Wayland/EGLRendererContextWayland.cpp"
-    "${HONKORDGL_ROOT}/src/DRM/EventsDRM.cpp"
 )
 
+set(HONKORDGL_PLATFORM_LINUX "")
+if(HONKORDGL_ENABLE_X11)
+    list(APPEND HONKORDGL_PLATFORM_LINUX ${HONKORDGL_LINUX_X11_SOURCES})
+endif()
+if(HONKORDGL_ENABLE_WAYLAND)
+    list(APPEND HONKORDGL_PLATFORM_LINUX ${HONKORDGL_LINUX_WAYLAND_SOURCES})
+endif()
+if(NOT HONKORDGL_ENABLE_X11 AND NOT HONKORDGL_ENABLE_WAYLAND)
+    message(FATAL_ERROR "HonkordGL: enable at least one of HONKORDGL_ENABLE_X11 or HONKORDGL_ENABLE_WAYLAND for Linux desktop.")
+endif()
+# DRM poll helpers are required by X11/Wayland event routing even when KMS attach is off — TU selects stub vs DRM via HONKORDGL_ENABLE_DRM.
+list(APPEND HONKORDGL_PLATFORM_LINUX "${HONKORDGL_ROOT}/src/DRM/EventsDRM.cpp")
+
+set(HONKORDGL_VULKAN_EFFECTIVE OFF)
+if(HONKORDGL_ENABLE_VULKAN STREQUAL "AUTO")
+    find_package(Vulkan QUIET)
+    if(Vulkan_FOUND)
+        set(HONKORDGL_VULKAN_EFFECTIVE ON)
+    endif()
+elseif(HONKORDGL_ENABLE_VULKAN STREQUAL "ON")
+    find_package(Vulkan REQUIRED)
+    set(HONKORDGL_VULKAN_EFFECTIVE ON)
+elseif(HONKORDGL_ENABLE_VULKAN STREQUAL "OFF")
+    set(HONKORDGL_VULKAN_EFFECTIVE OFF)
+else()
+    message(FATAL_ERROR "HonkordGL: HONKORDGL_ENABLE_VULKAN must be AUTO, ON, or OFF")
+endif()
+
+if(HONKORDGL_VULKAN_EFFECTIVE AND UNIX AND NOT APPLE AND NOT ANDROID)
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/src/VulkanRendererContext.cpp")
+elseif(UNIX AND NOT APPLE AND NOT ANDROID)
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp")
+    list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/src/VulkanIntegrationStubs.cpp")
+    if(NOT HONKORDGL_ENABLE_VULKAN STREQUAL "OFF")
+        message(WARNING "HonkordGL: Vulkan not available — using VulkanNoop and Vulkan integration stubs (install libvulkan-dev for full Vulkan attach + integration API).")
+    endif()
+endif()
+
+set(HONKORDGL_PIPEWIRE_TARGET "")
+if(UNIX AND NOT APPLE AND NOT ANDROID AND HONKORDGL_ENABLE_PIPEWIRE AND HONKORDGL_ENABLE_AUDIO)
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(HONKORDGL_PW IMPORTED_TARGET libpipewire-0.3)
+    endif()
+    if(TARGET PkgConfig::HONKORDGL_PW)
+        set(HONKORDGL_PIPEWIRE_TARGET PkgConfig::HONKORDGL_PW)
+        list(APPEND HONKORDGL_CORE_LINUX "${HONKORDGL_ROOT}/src/Audio/PipeWire.cpp")
+    else()
+        message(WARNING "HonkordGL: PipeWire requested but libpipewire-0.3 was not found — falling back to ALSA.")
+        set(HONKORDGL_ENABLE_PIPEWIRE OFF CACHE BOOL "" FORCE)
+    endif()
+endif()
+
 set(HONKORDGL_CORE_WINDOWS
+    "${HONKORDGL_ROOT}/src/BackendCapabilities.cpp"
+    "${HONKORDGL_ROOT}/src/VulkanWindowHelper.cpp"
+    "${HONKORDGL_ROOT}/src/VulkanIntegrationStubs.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxDisplayIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/LinuxEvdevIntegration.cpp"
+    "${HONKORDGL_ROOT}/src/MetalIntegrationStub.cpp"
     "${HONKORDGL_ROOT}/src/Video.cpp"
     "${HONKORDGL_ROOT}/src/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/SoftwareRenderer.cpp"
     "${HONKORDGL_ROOT}/src/TextUI.cpp"
     "${HONKORDGL_ROOT}/src/GpuRenderer.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderTarget.cpp"
+    "${HONKORDGL_ROOT}/src/GpuRenderGraph.cpp"
     "${HONKORDGL_ROOT}/src/GpuCapabilities.cpp"
     "${HONKORDGL_ROOT}/src/OpenGlIntegration.cpp"
     "${HONKORDGL_ROOT}/src/GpuShaderCompiler.cpp"
@@ -72,52 +174,128 @@ set(HONKORDGL_CORE_WINDOWS
     "${HONKORDGL_ROOT}/works/AsteroidGame/VulkanNoop.cpp"
 )
 
+set(HONKORDGL_WIN_D3D_SRC "${HONKORDGL_ROOT}/src/Win32/D3D11RendererContext.cpp")
+if(NOT HONKORDGL_ENABLE_D3D11)
+    set(HONKORDGL_WIN_D3D_SRC "${HONKORDGL_ROOT}/src/Win32/D3D11RendererContextDisabled.cpp")
+endif()
 set(HONKORDGL_PLATFORM_WINDOWS
     "${HONKORDGL_ROOT}/src/Win32/WindowBackend.cpp"
     "${HONKORDGL_ROOT}/src/Win32/EventsWin32.cpp"
     "${HONKORDGL_ROOT}/src/Win32/WGLRendererContext.cpp"
-    "${HONKORDGL_ROOT}/src/Win32/D3D11RendererContext.cpp"
+    "${HONKORDGL_WIN_D3D_SRC}"
 )
 
 if(WIN32)
+    set(HONKORDGL_CFG_HAVE_OPENGL 1)
+    set(HONKORDGL_CFG_HAVE_VULKAN 0)
+    if(HONKORDGL_ENABLE_D3D11)
+        set(HONKORDGL_CFG_HAVE_D3D11 1)
+    else()
+        set(HONKORDGL_CFG_HAVE_D3D11 0)
+    endif()
+    set(HONKORDGL_CFG_HAVE_METAL 0)
+    if(HONKORDGL_ENABLE_AUDIO)
+        set(HONKORDGL_CFG_HAVE_AUDIO 1)
+    else()
+        set(HONKORDGL_CFG_HAVE_AUDIO 0)
+    endif()
+    honkordgl_configure_build_features_header()
+
     add_library(HonkordGL ${HONKORDGL_CORE_WINDOWS} ${HONKORDGL_PLATFORM_WINDOWS})
-    target_link_libraries(HonkordGL PRIVATE user32 gdi32 winmm ole32 ws2_32 d3d11 dxgi d3dcompiler)
+    set(_honkordgl_win_libs user32 gdi32 winmm ole32 ws2_32)
+    if(HONKORDGL_ENABLE_D3D11)
+        list(APPEND _honkordgl_win_libs d3d11 dxgi d3dcompiler)
+    endif()
+    target_link_libraries(HonkordGL PRIVATE ${_honkordgl_win_libs})
     target_link_libraries(HonkordGL PUBLIC opengl32)
+    if(NOT HONKORDGL_ENABLE_AUDIO)
+        target_compile_definitions(HonkordGL PRIVATE HONKORDGL_AUDIO_DISABLED=1)
+    endif()
 elseif(APPLE)
     include("${CMAKE_CURRENT_LIST_DIR}/HonkordGLApple.cmake")
 elseif(UNIX AND NOT APPLE AND NOT ANDROID)
-    find_program(HONKORDGL_WAYLAND_SCANNER NAMES wayland-scanner)
-    if(HONKORDGL_USE_BUNDLED_WAYLAND_PROTOCOLS OR NOT HONKORDGL_WAYLAND_SCANNER)
-        file(GLOB HONKORDGL_WAYLAND_SRCS CONFIGURE_DEPENDS
-            "${HONKORDGL_ROOT}/src/Wayland/generated/*-protocol.c")
-    else()
-        include("${CMAKE_CURRENT_LIST_DIR}/WaylandProtocols.cmake")
-        set(HONKORDGL_WAYLAND_SRCS "${HONKORD_WAYLAND_GENERATED_C}")
+    set(HONKORDGL_WAYLAND_SRCS "")
+    if(HONKORDGL_ENABLE_WAYLAND)
+        find_program(HONKORDGL_WAYLAND_SCANNER NAMES wayland-scanner)
+        if(HONKORDGL_USE_BUNDLED_WAYLAND_PROTOCOLS OR NOT HONKORDGL_WAYLAND_SCANNER)
+            file(GLOB HONKORDGL_WAYLAND_SRCS CONFIGURE_DEPENDS
+                "${HONKORDGL_ROOT}/src/Wayland/generated/*-protocol.c")
+        else()
+            include("${CMAKE_CURRENT_LIST_DIR}/WaylandProtocols.cmake")
+            set(HONKORDGL_WAYLAND_SRCS "${HONKORD_WAYLAND_GENERATED_C}")
+        endif()
     endif()
+
+    set(HONKORDGL_CFG_HAVE_OPENGL 1)
+    if(HONKORDGL_VULKAN_EFFECTIVE)
+        set(HONKORDGL_CFG_HAVE_VULKAN 1)
+    else()
+        set(HONKORDGL_CFG_HAVE_VULKAN 0)
+    endif()
+    set(HONKORDGL_CFG_HAVE_D3D11 0)
+    set(HONKORDGL_CFG_HAVE_METAL 0)
+    if(HONKORDGL_ENABLE_AUDIO)
+        set(HONKORDGL_CFG_HAVE_AUDIO 1)
+    else()
+        set(HONKORDGL_CFG_HAVE_AUDIO 0)
+    endif()
+    honkordgl_configure_build_features_header()
 
     add_library(HonkordGL
         ${HONKORDGL_CORE_LINUX}
         ${HONKORDGL_PLATFORM_LINUX}
         ${HONKORDGL_WAYLAND_SRCS})
-    target_link_libraries(HonkordGL PRIVATE
-        X11 Xrandr Xi Xcursor
-        wayland-client wayland-egl wayland-cursor
-        asound dl pthread m)
+
+    set(_honkordgl_linux_libs dl pthread m)
+    if(HONKORDGL_ENABLE_X11)
+        list(APPEND _honkordgl_linux_libs X11 Xrandr Xi Xcursor)
+    endif()
+    if(HONKORDGL_ENABLE_WAYLAND)
+        list(APPEND _honkordgl_linux_libs wayland-client wayland-egl wayland-cursor)
+    endif()
+    if(HONKORDGL_ENABLE_AUDIO AND HONKORDGL_ENABLE_ALSA AND NOT HONKORDGL_ENABLE_PIPEWIRE)
+        list(APPEND _honkordgl_linux_libs asound)
+    endif()
+    target_link_libraries(HonkordGL PRIVATE ${_honkordgl_linux_libs})
+    if(HONKORDGL_PIPEWIRE_TARGET)
+        target_link_libraries(HonkordGL PRIVATE ${HONKORDGL_PIPEWIRE_TARGET})
+    endif()
     target_link_libraries(HonkordGL PUBLIC EGL GL)
+    if(HONKORDGL_VULKAN_EFFECTIVE)
+        target_link_libraries(HonkordGL PUBLIC Vulkan::Vulkan)
+    endif()
+
+    if(HONKORDGL_ENABLE_PIPEWIRE AND HONKORDGL_PIPEWIRE_TARGET)
+        target_compile_definitions(HonkordGL PRIVATE HONKORDGL_AUDIO_USE_PIPEWIRE=1)
+    else()
+        target_compile_definitions(HonkordGL PRIVATE HONKORDGL_AUDIO_USE_PIPEWIRE=0)
+    endif()
+    if(NOT HONKORDGL_ENABLE_AUDIO)
+        target_compile_definitions(HonkordGL PRIVATE HONKORDGL_AUDIO_DISABLED=1)
+    endif()
+    if(HONKORDGL_ENABLE_DRM)
+        target_compile_definitions(HonkordGL PRIVATE HONKORDGL_ENABLE_DRM)
+    endif()
 else()
     message(FATAL_ERROR "HonkordGL CMake currently supports Windows, Linux desktop, and macOS (Apple) only.")
 endif()
 
 target_include_directories(HonkordGL
     PUBLIC
-        "${HONKORDGL_ROOT}/include"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear"
-        "${HONKORDGL_ROOT}/third_party/Nuklear"
+        "$<BUILD_INTERFACE:${HONKORDGL_ROOT}/include>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
+        "$<INSTALL_INTERFACE:include>"
     PRIVATE
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear"
+        "${HONKORDGL_ROOT}/bundles/Nuklear"
         "${HONKORDGL_ROOT}/src"
         "${HONKORDGL_ROOT}/src/Wayland"
 )
+
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(HonkordGL PRIVATE HONKORDGL_BUILDING_DLL)
+endif()
 
 set_target_properties(HonkordGL PROPERTIES
     OUTPUT_NAME HonkordGL
@@ -125,6 +303,20 @@ set_target_properties(HonkordGL PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
+
+option(HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY "Run scripts/check_public_headers.py before building HonkordGL" ON)
+if(HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_custom_target(honkordgl_public_header_check
+            COMMAND ${Python3_EXECUTABLE} "${HONKORDGL_ROOT}/scripts/check_public_headers.py"
+            COMMENT "Checking HonkordGL public header boundary"
+            VERBATIM)
+        add_dependencies(HonkordGL honkordgl_public_header_check)
+    else()
+        message(WARNING "HonkordGL: Python 3 not found; install it or set HONKORDGL_ENFORCE_PUBLIC_HEADER_BOUNDARY=OFF (public header boundary check skipped)")
+    endif()
+endif()
 
 if(MINGW)
     target_compile_options(HonkordGL PRIVATE
@@ -227,14 +419,15 @@ if(HONKORDGL_BUILD_EXAMPLES)
 
     add_executable(ImGuiDemo
         "${HONKORDGL_ROOT}/works/ImGuiDemo/Main.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkordgl.cpp")
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_draw.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_tables.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_widgets.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_impl_honkordgl.cpp")
     target_include_directories(ImGuiDemo PRIVATE
         "${HONKORDGL_ROOT}/include"
-        "${HONKORDGL_ROOT}/src")
+        "${HONKORDGL_ROOT}/src"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui")
     target_link_libraries(ImGuiDemo PRIVATE HonkordGL)
     add_dependencies(ImGuiDemo HonkordGL)
     honkordgl_set_example_output_dir(ImGuiDemo works/ImGuiDemo)
@@ -250,14 +443,15 @@ if(HONKORDGL_BUILD_EXAMPLES)
 
     add_executable(ImGuiSoftwareDemo
         "${HONKORDGL_ROOT}/works/ImGuiSoftwareDemo/Main.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkord_software.cpp")
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_draw.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_tables.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_widgets.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_impl_honkord_software.cpp")
     target_include_directories(ImGuiSoftwareDemo PRIVATE
         "${HONKORDGL_ROOT}/include"
-        "${HONKORDGL_ROOT}/src")
+        "${HONKORDGL_ROOT}/src"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui")
     target_link_libraries(ImGuiSoftwareDemo PRIVATE HonkordGL)
     add_dependencies(ImGuiSoftwareDemo HonkordGL)
     honkordgl_set_example_output_dir(ImGuiSoftwareDemo works/ImGuiSoftwareDemo)
@@ -273,12 +467,14 @@ if(HONKORDGL_BUILD_EXAMPLES)
 
     add_executable(NuklearDemo
         "${HONKORDGL_ROOT}/works/NuklearDemo/Main.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_honkord_core.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkord_input.cpp"
-        "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkordgl.cpp")
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_honkord_core.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_impl_honkord_input.cpp"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_impl_honkordgl.cpp")
     target_include_directories(NuklearDemo PRIVATE
         "${HONKORDGL_ROOT}/include"
-        "${HONKORDGL_ROOT}/src")
+        "${HONKORDGL_ROOT}/src"
+        "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear"
+        "${HONKORDGL_ROOT}/bundles/Nuklear")
     target_link_libraries(NuklearDemo PRIVATE HonkordGL)
     add_dependencies(NuklearDemo HonkordGL)
     honkordgl_set_example_output_dir(NuklearDemo works/NuklearDemo)
@@ -307,11 +503,11 @@ if(HONKORDGL_BUILD_EXAMPLES)
         set_source_files_properties("${_pc_imgui_demo}" PROPERTIES HEADER_FILE_ONLY ON)
         set(_imgui_demo_main "${HONKORDGL_ROOT}/works/ImGuiDemo/Main.cpp")
         set(_imgui_demo_vendor
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkordgl.cpp")
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_draw.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_tables.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_widgets.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_impl_honkordgl.cpp")
         source_group("works/ImGuiDemo" FILES "${_imgui_demo_main}")
         source_group("works/ImGuiDemo/imgui" FILES ${_imgui_demo_vendor})
         source_group("works/ImGuiDemo/pkgconfig" FILES "${_pc_imgui_demo}")
@@ -321,11 +517,11 @@ if(HONKORDGL_BUILD_EXAMPLES)
         set_source_files_properties("${_pc_imgui_sw}" PROPERTIES HEADER_FILE_ONLY ON)
         set(_imgui_sw_main "${HONKORDGL_ROOT}/works/ImGuiSoftwareDemo/Main.cpp")
         set(_imgui_sw_vendor
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_draw.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_tables.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_widgets.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_ImGui/imgui_impl_honkord_software.cpp")
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_draw.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_tables.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_widgets.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_ImGui/imgui_impl_honkord_software.cpp")
         source_group("works/ImGuiSoftwareDemo" FILES "${_imgui_sw_main}")
         source_group("works/ImGuiSoftwareDemo/imgui" FILES ${_imgui_sw_vendor})
         source_group("works/ImGuiSoftwareDemo/pkgconfig" FILES "${_pc_imgui_sw}")
@@ -335,9 +531,9 @@ if(HONKORDGL_BUILD_EXAMPLES)
         set_source_files_properties("${_pc_nk}" PROPERTIES HEADER_FILE_ONLY ON)
         set(_nk_main "${HONKORDGL_ROOT}/works/NuklearDemo/Main.cpp")
         set(_nk_vendor
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_honkord_core.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkord_input.cpp"
-            "${HONKORDGL_ROOT}/third_party/HonkordGL_Nuklear/nuklear_impl_honkordgl.cpp")
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_honkord_core.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_impl_honkord_input.cpp"
+            "${HONKORDGL_ROOT}/bundles/HonkordGL_Nuklear/nuklear_impl_honkordgl.cpp")
         source_group("works/NuklearDemo" FILES "${_nk_main}")
         source_group("works/NuklearDemo/nuklear" FILES ${_nk_vendor})
         source_group("works/NuklearDemo/pkgconfig" FILES "${_pc_nk}")
@@ -361,11 +557,21 @@ if(HONKORDGL_BUILD_TESTS)
     honkordgl_private_app(TestAudioSmoke _ta)
     honkordgl_set_test_output_dir(TestAudioSmoke tests/Audio)
 
+    set(_tbc "${HONKORDGL_ROOT}/tests/Portability/TestBackendCapabilities.cpp")
+    honkordgl_private_app(TestBackendCapabilities _tbc)
+    honkordgl_set_test_output_dir(TestBackendCapabilities tests/Portability)
+
+    set(_tub "${HONKORDGL_ROOT}/tests/Portability/TestUmbrellaInclude.cpp")
+    honkordgl_private_app(TestUmbrellaInclude _tub)
+    honkordgl_set_test_output_dir(TestUmbrellaInclude tests/Portability)
+
     if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
         honkordgl_xcode_pair_sources(TestWindow tests Window TestWindow.cpp TestWindow)
         honkordgl_xcode_pair_sources(TestSprite tests DrawSprite TestSprite.cpp TestSprite)
         honkordgl_xcode_pair_sources(TestDeferredRenderer tests DeferredRenderer TestDeferredRenderer.cpp TestDeferredRenderer)
         honkordgl_xcode_pair_sources(TestAudioSmoke tests Audio TestAudioSmoke.cpp TestAudioSmoke)
+        honkordgl_xcode_pair_sources(TestBackendCapabilities tests Portability TestBackendCapabilities.cpp TestBackendCapabilities)
+        honkordgl_xcode_pair_sources(TestUmbrellaInclude tests Portability TestUmbrellaInclude.cpp TestUmbrellaInclude)
     endif()
 endif()
 

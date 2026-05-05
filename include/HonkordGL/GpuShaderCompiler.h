@@ -5,6 +5,11 @@
  * Copyright (C) 2026 Honkord
  */
 
+/**
+ * @file GpuShaderCompiler.h
+ * @brief Source-level GLSL helpers and conveniences; implementation stays in `src/`. No vendor SDK symbols here.
+ */
+
 #ifndef HONKORDGL_GPUSHADERCOMPILER_H
 #define HONKORDGL_GPUSHADERCOMPILER_H
 

@@ -1,0 +1,3 @@
+/home/dasd/Projects/Libraries/HonkordGL/build-consumer/CMakeFiles/consume.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-consumer/CMakeFiles/edit_cache.dir
+/home/dasd/Projects/Libraries/HonkordGL/build-consumer/CMakeFiles/rebuild_cache.dir

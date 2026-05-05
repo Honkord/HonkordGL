@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-#if HONKORDGL_PLATFORM_LINUX && HONKORDGL_AUDIO_USE_PIPEWIRE
+#if !HONKORDGL_AUDIO_DISABLED && HONKORDGL_PLATFORM_LINUX && HONKORDGL_AUDIO_USE_PIPEWIRE
 
 #include <pipewire/pipewire.h>
 #include <pipewire/stream.h>

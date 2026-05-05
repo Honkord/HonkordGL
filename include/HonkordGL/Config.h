@@ -46,17 +46,27 @@
 //      API dll declaration macros
 //////////////////////////////////////////////////////
 #ifndef HONKORDGL_API
-# ifdef _MSV_VER 
-#   ifdef dllexport 
+# if defined(_WIN32)
+#   if defined(HONKORDGL_BUILDING_DLL)
 #     define HONKORDGL_API __declspec(dllexport)
-#   elif dllimport
+#   elif defined(HONKORDGL_USING_DLL)
 #     define HONKORDGL_API __declspec(dllimport)
+#   else
+#     define HONKORDGL_API
 #   endif
-# else 
-#   define HONKORDGL_API 
+# else
+#   if defined(HONKORDGL_BUILDING_DLL) && defined(__GNUC__)
+#     define HONKORDGL_API __attribute__((visibility("default")))
+#   else
+#     define HONKORDGL_API
+#   endif
 # endif
 #endif
 //////////////////////////////////////////////////////
+
+#ifndef HONKORDGL_AUDIO_DISABLED
+#define HONKORDGL_AUDIO_DISABLED 0
+#endif
 
 //////////////////////////////////////////////////////
 //      Enable Warnings
